@@ -57,12 +57,14 @@
                 Email : demo@gmail.com
               </span>
             </a>
+            @auth
             <a href="">
-              <i class="fa fa-map-marker" aria-hidden="true"></i>
+              <i class="fa fa-user" aria-hidden="true"></i>
               <span>
-                Location
+                {{ Auth::user()->name }}
               </span>
             </a>
+            @endauth
           </div>
         </div>
       </div>
@@ -86,6 +88,12 @@
                     <li class="nav-item active">
                         <a class="nav-link" href="index.html">Home <span class="sr-only">(current)</span></a>
                     </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="about.html"> About</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="treatment.html">Treatment</a>
+                    </li>
                     @else
                     <li class="nav-item">
                         <a class="nav-link" href="about.html"> About</a>
@@ -107,6 +115,7 @@
                 </ul>
               </div>
               <div class="quote_btn-container">
+                @guest
                 <a href="{{ route('login') }}">
                   <i class="fa fa-user" aria-hidden="true"></i>
                   <span>
@@ -120,7 +129,21 @@
                   <span>
                     Sign Up
                   </span>
+                </a>                  
+                @endguest
+                @auth
+                <a  href="{{ route('logout') }}"
+                onclick="event.preventDefault();
+                              document.getElementById('logout-form').submit();">
+                  <i class="fa fa-user" aria-hidden="true"></i>
+                  <span>
+                    Logout
+                  </span>
                 </a>
+                <form  id="logout-form"action="{{ route('logout') }}" method="POST" class="d-none">
+                  @csrf
+              </form>
+                @endauth
                 <form class="form-inline">
                   <button class="btn  my-2 my-sm-0 nav_search-btn" type="submit">
                     <i class="fa fa-search" aria-hidden="true"></i>
@@ -420,7 +443,7 @@
         <div class="col-md-6 col-lg-3">
           <div class="box ">
             <div class="img-box">
-              <img src="images/t4.png" alt="">
+              <img src="mico-html/images/t4.png" alt="">
             </div>
             <div class="detail-box">
               <h4>
@@ -455,7 +478,7 @@
           <div class="item">
             <div class="box">
               <div class="img-box">
-                <img src="images/team1.jpg" alt="" />
+                <img src="mico-html/images/team1.jpg" alt="" />
               </div>
               <div class="detail-box">
                 <h5>
@@ -484,7 +507,7 @@
           <div class="item">
             <div class="box">
               <div class="img-box">
-                <img src="images/team2.jpg" alt="" />
+                <img src="mico-html/images/team2.jpg" alt="" />
               </div>
               <div class="detail-box">
                 <h5>
@@ -513,7 +536,7 @@
           <div class="item">
             <div class="box">
               <div class="img-box">
-                <img src="images/team3.jpg" alt="" />
+                <img src="mico-html/images/team3.jpg" alt="" />
               </div>
               <div class="detail-box">
                 <h5>
@@ -663,7 +686,7 @@
         </div>
         <div class="col-md-5">
           <div class="img-box">
-            <img src="images/contact-img.jpg" alt="">
+            <img src="mico-html/images/contact-img.jpg" alt="">
           </div>
         </div>
       </div>
@@ -677,7 +700,7 @@
       <div class="info_top">
         <div class="info_logo">
           <a href="">
-            <img src="images/logo.png" alt="">
+            <img src="mico-html/images/logo.png" alt="">
           </a>
         </div>
         <div class="info_form">
@@ -764,7 +787,7 @@
               </h5>
               <div class="post_box">
                 <div class="img-box">
-                  <img src="images/post1.jpg" alt="">
+                  <img src="mico-html/images/post1.jpg" alt="">
                 </div>
                 <p>
                   Normal
@@ -773,7 +796,7 @@
               </div>
               <div class="post_box">
                 <div class="img-box">
-                  <img src="images/post2.jpg" alt="">
+                  <img src="mico-html/images/post2.jpg" alt="">
                 </div>
                 <p>
                   Normal
@@ -789,7 +812,7 @@
               </h5>
               <div class="post_box">
                 <div class="img-box">
-                  <img src="images/post3.jpg" alt="">
+                  <img src="mico-html/images/post3.jpg" alt="">
                 </div>
                 <p>
                   Normal
@@ -798,7 +821,7 @@
               </div>
               <div class="post_box">
                 <div class="img-box">
-                  <img src="images/post4.png" alt="">
+                  <img src="mico-html/images/post4.png" alt="">
                 </div>
                 <p>
                   Normal
