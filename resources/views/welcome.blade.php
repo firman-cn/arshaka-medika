@@ -142,7 +142,7 @@
                 </a>
                 <form  id="logout-form"action="{{ route('logout') }}" method="POST" class="d-none">
                   @csrf
-              </form>
+                </form>
                 @endauth
                 <form class="form-inline">
                   <button class="btn  my-2 my-sm-0 nav_search-btn" type="submit">
