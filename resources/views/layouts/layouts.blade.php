@@ -22,7 +22,7 @@
     <!-- Layout styles -->
     <link rel="stylesheet" href="admin_template/template/assets/css/style.css">
     <!-- End layout styles -->
-    <link rel="shortcut icon" href="assets/images/favicon.png" />
+    <link rel="shortcut icon" href="admin_template/template/assets/images/favicon.png" />
   </head>
   <body>
     <div class="container-scroller">
@@ -299,6 +299,12 @@
     <script src="admin_template/template/assets/js/settings.js"></script>
     <script src="admin_template/template/assets/js/todolist.js"></script>
     <!-- endinject -->
+
+    <!-- Custom js for this page -->
+    <script src="admin_template/template/assets/js/file-upload.js"></script>
+    <script src="admin_template/template/assets/js/typeahead.js"></script>
+    <script src="admin_template/template/assets/js/select2.js"></script>
+    <!-- End custom js for this page -->
     <!-- Custom js for this page -->
     <script src="admin_template/template/assets/js/dashboard.js"></script>
     <!-- End custom js for this page -->
@@ -310,27 +316,7 @@
 
      <!-- Bootstrap Datepicker JS -->
      <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
-    <script>
-        $(document).ready(function () {
-            // Simpan angka urut sebagai variabel global
-            let urut = 1;
-
-                // Ambil tahun sekarang dan ambil 2 digit terakhir
-                let year = new Date().getFullYear().toString().slice(-2);
-
-                // Format angka urut menjadi 4 digit dengan leading zero
-                let number = urut.toString().padStart(4, '0');
-
-                // Gabungkan tahun dengan angka urut
-                let nomer_rekam_medis = year + number;
-
-                // Masukkan nomor ke input field
-                $("#nomer_rekam_medis").val(nomer_rekam_medis);
-
-                // Tambahkan counter
-                urut++;
-        });
-    </script>
+    
     <script>
         $(document).ready(function () {
             // Aktifkan Datepicker
@@ -341,6 +327,55 @@
                 yearRange: "1900:2100" // Rentang tahun yang tersedia
             });
         });
+    </script>
+
+    <script>
+          $(document).ready(function () {
+
+            $("#nomor_rekam_medis").val("");
+            $("#nomor_rekam_medis").val("");
+            $("#nama_pasien").val("");
+            $("#tgl_lahir").val("");
+            $("#alamat").val("");
+            $(".inputan-pemeriksaan").hide();
+
+
+            $("#cek_rekam_medis").on("click", function () {
+              var nomor_rekam_medis = $("input[name='nomor_rekam_medis']").val();
+              if (nomor_rekam_medis.trim() === "") {
+                alert("Silakan masukkan nomor rekam medis terlebih dahulu.");
+                return;
+              }
+
+              $.ajax({
+                url: "/carinorekammedis",                 // Ganti dengan endpoint Laravel Anda
+                type: "GET",
+                data: { nomor_rekam_medis: nomor_rekam_medis },
+                dataType: "json",
+                success: function (response) {
+                  if (response.success) {
+                    $("#pasien").val(response.data.pasien);
+                    $("#nama_pasien").val(response.data.nama_pasien);
+                    $("#tgl_lahir").val(response.data.tgl_lahir);
+                    $("#alamat").val(response.data.alamat);
+                    $(".inputan-pemeriksaan").show();
+
+                  }else{
+                    alert("Data tidak ditemukan.");
+                    // Kosongkan input jika data tidak ditemukan
+                    $("#pasien").val("");
+                    $("#nama_pasien").val("");
+                    $("#tgl_lahir").val("");
+                    $("#alamat").val("");
+                    $(".inputan-pemeriksaan").hide();
+                  }
+                },
+                error: function () {
+                    alert("Terjadi kesalahan saat mencari data. Silakan coba lagi.");
+                }
+              });
+            });
+          });
     </script>
   </body>
 </html>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Pasien;
+use App\Models\Pemeriksaan;
 use Error;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -25,6 +26,15 @@ class AdminController extends Controller
 
         return view('admin.tambahpasien',['newNomorRekamMedis'=>$newNomorRekamMedis]);
     }
+    public function listdatapasien(){
+        $pasien= Pasien::all();
+        return view('admin.listdatapasien',['pasien'=>$pasien]);
+    }
+
+    public function pemeriksaan(){
+        
+        return view('admin.pemeriksaan');
+    }
     // ===== CRUD PASIEN ==== //
     public function storepasien(Request $request){    
         try {
@@ -33,7 +43,7 @@ class AdminController extends Controller
                 'nama_pasien'=>$request->nama_pasien,
                 'tgl_lahir'=>$request->tgl_lahir,
                 'alamat'=>$request->tgl_lahir,
-                'jenis_kelamin'=>$request->tgl_lahir,
+                'jenis_kelamin'=>$request->jenis_kelamin,
                 'golongan_darah'=>$request->golongan_darah
             ]);
             //code...
@@ -41,5 +51,41 @@ class AdminController extends Controller
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
         }     
+    }
+
+    public function carinorekammedis(Request $request){
+        $nomor_rekam_medis = $request->input('nomor_rekam_medis');
+
+        $pasien = Pasien::where('nomor_rekam_medis', $nomor_rekam_medis)->first();
+
+        if ($pasien) {
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'pasien'=>$pasien->id,
+                    'nama_pasien' => $pasien->nama_pasien,
+                    'tgl_lahir' => $pasien->tgl_lahir,
+                    'alamat' => $pasien->alamat,
+                ],
+            ]);
+        }
+    
+        return response()->json([
+            'success' => false,
+            'message' => 'Data tidak ditemukan.',
+        ]);
+    }
+
+    public function storepemeriksaan( Request $request){
+
+       
+        Pemeriksaan::create([
+            'pasien'    => $request->pasien,   // Ambil id pasien dari hidden input
+            'berat_badan'  => $request->berat_badan,
+            'tinggi_badan' =>  $request->tinggi_badan,
+            'pelayanan'    =>  $request->pelayanan,
+        ]);
+
+        return redirect()->back()->with('success', 'Data pemeriksaan berhasil disimpan.');
     }
 }

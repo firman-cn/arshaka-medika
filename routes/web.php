@@ -22,7 +22,12 @@ Auth::routes();
                         // ==== ROUTE VIEW === //
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 Route::get('/index', [AdminController::class, 'index'])->name('index');
+Route::get('/listdatapasien', [AdminController::class, 'listdatapasien'])->name('listdatapasien');
 Route::get('/tambahpasien', [AdminController::class, 'tambahpasien'])->name('tambahpasien');
                     // =====ROUTE PROCCES PASIEN=====//
 Route::post('/storepasien', [AdminController::class, 'storepasien'])->name('storepasien');
 
+Route::get('/pemeriksaan', [AdminController::class, 'pemeriksaan'])->name('pemeriksaan');
+Route::get('/carinorekammedis', [AdminController::class, 'carinorekammedis'])->name('carinorekammedis');
+
+Route::post('/storepemeriksaan', [AdminController::class, 'storepemeriksaan'])->name('storepemeriksaan');
