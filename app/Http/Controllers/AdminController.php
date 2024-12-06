@@ -4,7 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Pasien;
 use App\Models\Pemeriksaan;
-use Error;
+use App\Models\Obat;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -31,10 +32,7 @@ class AdminController extends Controller
         return view('admin.listdatapasien',['pasien'=>$pasien]);
     }
 
-    public function pemeriksaan(){
-        
-        return view('admin.pemeriksaan');
-    }
+   
     // ===== CRUD PASIEN ==== //
     public function storepasien(Request $request){    
         try {
@@ -51,6 +49,24 @@ class AdminController extends Controller
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
         }     
+    }
+
+    // ======= PEMERIKSAAN ======== //
+    public function pemeriksaan(){
+        
+        return view('admin.pemeriksaan');
+    }
+    public function listpemeriksaan(){
+
+        $pemeriksaan = DB::table('pemeriksaans')
+        ->join('pasiens', 'pemeriksaans.pasien', '=', 'pasiens.id')
+        ->select(
+            'pemeriksaans.*',
+            'pasiens.*',
+        )
+        ->get();
+        
+        return view('admin.listpemeriksaan',['pemeriksaan'=>$pemeriksaan]);
     }
 
     public function carinorekammedis(Request $request){
@@ -77,8 +93,7 @@ class AdminController extends Controller
     }
 
     public function storepemeriksaan( Request $request){
-
-       
+ 
         Pemeriksaan::create([
             'pasien'    => $request->pasien,   // Ambil id pasien dari hidden input
             'berat_badan'  => $request->berat_badan,
@@ -88,4 +103,53 @@ class AdminController extends Controller
 
         return redirect()->back()->with('success', 'Data pemeriksaan berhasil disimpan.');
     }
+
+                 // ======= OBAT ======== //
+    public function tambahobat(){
+        $lastRecord = DB::table('obats')->latest('kode_obat')->first();
+
+        $currentYear = now()->format('y'); // Ambil 2 digit tahun saat ini (contoh: '24' untuk 2024)
+        $lastNumber = $lastRecord ? (int)substr($lastRecord->kode_obat, 2) : 0; // Ambil angka urut dari nomor terakhir
+        $newNumber = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT); // Tambahkan 1 dan format jadi 4 digit
+        $newKodeObat = 'K'.$currentYear . $newNumber;
+        return view('admin.tambahobat',['newKodeObat'=>$newKodeObat]);
+    }
+    public function listdataobat(){
+        $obat= Obat::all();  
+        return view('admin.listdataobat',['obat'=>$obat]);
+    }
+    public function transaksiobat($id){
+        $pemeriksaan = DB::table('pemeriksaans')
+        ->join('pasiens', 'pemeriksaans.pasien', '=', 'pasiens.id')
+        ->select(
+            'pemeriksaans.*',
+            'pasiens.*',
+            // 'pasiens.nomor_rekam_medis'
+        )
+        ->where('pemeriksaans.id', $id)
+        ->first();
+
+        // return dd($pemeriksaan);
+        return view('admin.transaksiobat',['pemeriksaan'=>$pemeriksaan]);
+        
+
+    }
+
+    // public function transaksiobat(){
+
+    // }
+
+
+    public function storeobat(Request $request){
+        Obat::create([
+            'kode_obat'    => $request->kode_obat,   // Ambil id pasien dari hidden input
+            'nama_obat'  => $request->nama_obat,
+            'harga_jual'  => $request->harga_jual,
+            'harga_beli' =>  $request->harga_beli,
+            'jenis_obat'    =>  $request->jenis_obat,
+        ]);
+        return back()->with('success','data berhasil di simpan');
+    }
+
+
 }

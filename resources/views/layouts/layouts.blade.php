@@ -8,36 +8,41 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" rel="stylesheet">
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <!-- plugins:css -->
-    <link rel="stylesheet" href="admin_template/template/assets/vendors/mdi/css/materialdesignicons.min.css">
-    <link rel="stylesheet" href="admin_template/assets/vendors/css/vendor.bundle.base.css">
+    <link rel="stylesheet" href="{{ asset('admin_template/template/assets/vendors/mdi/css/materialdesignicons.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('admin_template/template/assets/vendors/css/vendor.bundle.base.css') }}">
     <!-- endinject -->
     <!-- Plugin css for this page -->
-    <link rel="stylesheet" href="admin_template/template/assets/vendors/jvectormap/jquery-jvectormap.css">
-    <link rel="stylesheet" href="admin_template/template/assets/vendors/flag-icon-css/css/flag-icon.min.css">
-    <link rel="stylesheet" href="admin_template/template/assets/vendors/owl-carousel-2/owl.carousel.min.css">
-    <link rel="stylesheet" href="admin_template/template/assets/vendors/owl-carousel-2/owl.theme.default.min.css">
+    <link rel="stylesheet" href="{{ asset('admin_template/template/assets/vendors/jvectormap/jquery-jvectormap.css') }}">
+
+    <link rel="stylesheet" href="{{ asset('admin_template/template/assets/vendors/jvectormap/jquery-jvectormap.css') }}">
+    <link rel="stylesheet" href="{{ asset('admin_template/template/assets/vendors/flag-icon-css/css/flag-icon.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('admin_template/template/assets/vendors/owl-carousel-2/owl.carousel.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('admin_template/template/assets/vendors/owl-carousel-2/owl.theme.default.min.css') }}">
     <!-- End plugin css for this page -->
     <!-- inject:css -->
     <!-- endinject -->
     <!-- Layout styles -->
-    <link rel="stylesheet" href="admin_template/template/assets/css/style.css">
+
+    <link rel="stylesheet" href="{{ asset('admin_template/template/assets/css/style.css') }}">
+
+    {{-- <link rel="stylesheet" href="admin_template/template/assets/css/style.css"> --}}
     <!-- End layout styles -->
-    <link rel="shortcut icon" href="admin_template/template/assets/images/favicon.png" />
+    <link rel="shortcut icon" href="{{ asset('admin_template/template/assets/images/favicon.png') }}" />
   </head>
   <body>
     <div class="container-scroller">
       <!-- partial:partials/_sidebar.html -->
       <nav class="sidebar sidebar-offcanvas" id="sidebar">
         <div class="sidebar-brand-wrapper d-none d-lg-flex align-items-center justify-content-center fixed-top">
-          <a class="sidebar-brand brand-logo" href="index.html"><img src="admin_template/template/assets/images/logo.svg" alt="logo" /></a>
-          <a class="sidebar-brand brand-logo-mini" href="index.html"><img src="admin_template/template/assets/images/logo-mini.svg" alt="logo" /></a>
+          <a class="sidebar-brand brand-logo" href="index.html"><img src="{{ asset('admin_template/template/assets/images/logo.svg') }}" alt="logo" /></a>
+          <a class="sidebar-brand brand-logo-mini" href="index.html"><img src="{{ asset('admin_template/template/assets/images/logo-mini.svg') }}" alt="logo" /></a>
         </div>
         <ul class="nav">
           <li class="nav-item profile">
             <div class="profile-desc">
               <div class="profile-pic">
                 <div class="count-indicator">
-                  <img class="img-xs rounded-circle " src="admin_template/template/assets/images/faces/face15.jpg" alt="">
+                  <img class="img-xs rounded-circle " src="{{ asset('admin_template/template/assets/images/faces/face15.jpg') }}" alt="">
                   <span class="count bg-success"></span>
                 </div>
                 <div class="profile-name">
@@ -235,7 +240,7 @@
               <li class="nav-item dropdown">
                 <a class="nav-link" id="profileDropdown" href="#" data-toggle="dropdown">
                   <div class="navbar-profile">
-                    <img class="img-xs rounded-circle" src="admin_template/template/assets/images/faces/face15.jpg" alt="">
+                    <img class="img-xs rounded-circle" src="{{ asset('admin_template/template/assets/images/faces/face15.jpg') }}" alt="">
                     <p class="mb-0 d-none d-sm-block navbar-profile-name">Henry Klein</p>
                     <i class="mdi mdi-menu-down d-none d-sm-block"></i>
                   </div>
@@ -283,30 +288,30 @@
     </div>
     <!-- container-scroller -->
     <!-- plugins:js -->
-    <script src="admin_template/template/assets/vendors/js/vendor.bundle.base.js"></script>
+    <script src="{{ asset('admin_template/template/assets/vendors/js/vendor.bundle.base.js') }}"></script>
     <!-- endinject -->
     <!-- Plugin js for this page -->
-    <script src="admin_template/template/assets/vendors/chart.js/Chart.min.js"></script>
-    <script src="admin_template/template/assets/vendors/progressbar.js/progressbar.min.js"></script>
-    <script src="admin_template/template/assets/vendors/jvectormap/jquery-jvectormap.min.js"></script>
-    <script src="admin_template/template/assets/vendors/jvectormap/jquery-jvectormap-world-mill-en.js"></script>
-    <script src="admin_template/template/assets/vendors/owl-carousel-2/owl.carousel.min.js"></script>
+    <script src="{{ asset('admin_template/template/assets/vendors/chart.js/Chart.min.js') }}"></script>
+    <script src="{{ asset('admin_template/template/assets/vendors/progressbar.js/progressbar.min.js') }}"></script>
+    <script src="{{ asset('admin_template/template/assets/vendors/jvectormap/jquery-jvectormap.min.js') }}"></script>
+    <script src="{{ asset('admin_template/template/assets/vendors/jvectormap/jquery-jvectormap-world-mill-en.js') }}"></script>
+    <script src="{{ asset('admin_template/template/assets/vendors/owl-carousel-2/owl.carousel.min.js') }}"></script>
     <!-- End plugin js for this page -->
     <!-- inject:js -->
-    <script src="admin_template/template/assets/js/off-canvas.js"></script>
-    <script src="admin_template/template/assets/js/hoverable-collapse.js"></script>
-    <script src="admin_template/template/assets/js/misc.js"></script>
-    <script src="admin_template/template/assets/js/settings.js"></script>
-    <script src="admin_template/template/assets/js/todolist.js"></script>
+    <script src="{{ asset('admin_template/template/assets/js/off-canvas.js') }}"></script>
+    <script src="{{ asset('admin_template/template/assets/js/hoverable-collapse.js') }}"></script>
+    <script src="{{ asset('admin_template/template/assets/js/misc.js') }}"></script>
+    <script src="{{ asset('admin_template/template/assets/js/settings.js') }}"></script>
+    <script src="{{ asset('admin_template/template/assets/js/todolist.js') }}"></script>
     <!-- endinject -->
 
     <!-- Custom js for this page -->
-    <script src="admin_template/template/assets/js/file-upload.js"></script>
-    <script src="admin_template/template/assets/js/typeahead.js"></script>
-    <script src="admin_template/template/assets/js/select2.js"></script>
+    <script src="{{ asset('admin_template/template/assets/js/file-upload.js') }}"></script>
+    <script src="{{ asset('admin_template/template/assets/js/typeahead.js') }}"></script>
+    <script src="{{ asset('admin_template/template/assets/js/select2.js') }}"></script>
     <!-- End custom js for this page -->
     <!-- Custom js for this page -->
-    <script src="admin_template/template/assets/js/dashboard.js"></script>
+    <script src="{{asset('admin_template/template/assets/js/dashboard.js')  }}"></script>
     <!-- End custom js for this page -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
