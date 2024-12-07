@@ -42,3 +42,5 @@ Route::get('/transaksiobat/{id}', [AdminController::class, 'transaksiobat'])->na
 // Route::get('/transaksiobat', [AdminController::class, 'transaksiobat'])->name('transaksiobat');
 
 Route::post('/storeobat', [AdminController::class, 'storeobat'])->name('storeobat');
+Route::post('/storetransaksiobat', [AdminController::class, 'storetransaksiobat'])->name('storetransaksiobat');
+

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Pasien;
 use App\Models\Pemeriksaan;
 use App\Models\Obat;
+use App\Models\Transaksi;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -119,7 +120,7 @@ class AdminController extends Controller
         return view('admin.listdataobat',['obat'=>$obat]);
     }
     public function transaksiobat($id){
-        $pemeriksaan = DB::table('pemeriksaans')
+        $pemeriksaans = DB::table('pemeriksaans')
         ->join('pasiens', 'pemeriksaans.pasien', '=', 'pasiens.id')
         ->select(
             'pemeriksaans.*',
@@ -128,28 +129,36 @@ class AdminController extends Controller
         )
         ->where('pemeriksaans.id', $id)
         ->first();
+        $obat = Obat::all();
 
         // return dd($pemeriksaan);
-        return view('admin.transaksiobat',['pemeriksaan'=>$pemeriksaan]);
+        return view('admin.transaksiobat',['pemeriksaans'=>$pemeriksaans,'obat'=>$obat]);
         
 
     }
 
-    // public function transaksiobat(){
-
-    // }
+   
 
 
     public function storeobat(Request $request){
         Obat::create([
-            'kode_obat'    => $request->kode_obat,   // Ambil id pasien dari hidden input
-            'nama_obat'  => $request->nama_obat,
-            'harga_jual'  => $request->harga_jual,
-            'harga_beli' =>  $request->harga_beli,
+            'kode_obat'     => $request->kode_obat,   // Ambil id pasien dari hidden input
+            'nama_obat'     => $request->nama_obat,
+            'harga_jual'    => $request->harga_jual,
+            'harga_beli'    =>  $request->harga_beli,
             'jenis_obat'    =>  $request->jenis_obat,
+            'stok'          => $request->stok,
+            'deskripsi'     => $request->deskripsi
         ]);
         return back()->with('success','data berhasil di simpan');
     }
 
-
+    public function storetransaksiobat(Request $request){
+        Transaksi::create([
+            'obat' => $request->obat,
+            'jumlah' => $request->jumlah,
+            'total' => $request->total,
+        ]);
+        return response()->json(['message' => 'Transaksi berhasil disimpan!']);
+    }
 }

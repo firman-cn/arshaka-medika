@@ -19,6 +19,9 @@ return new class extends Migration
             $table->string('harga_beli');
             $table->string('harga_jual');
             $table->string('jenis_obat');
+            $table->string('stok');
+            $table->string('deskripsi')->nullable();
+
 
             
             $table->string('gambar_obat')->nullable();

@@ -22,10 +22,18 @@
     <!-- inject:css -->
     <!-- endinject -->
     <!-- Layout styles -->
-
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="stylesheet" href="{{ asset('admin_template/template/assets/css/style.css') }}">
+    <style>
+    .input-group .btn {
+        margin: 0 3px; /* Jarak horizontal antara tombol dan angka */
+    }
 
-    {{-- <link rel="stylesheet" href="admin_template/template/assets/css/style.css"> --}}
+    .input-group .jumlah-obat {
+        margin: 0 10px; /* Jarak horizontal di sekitar angka */
+        font-weight: bold; /* Optional: untuk menebalkan angka */
+    }
+</style>
     <!-- End layout styles -->
     <link rel="shortcut icon" href="{{ asset('admin_template/template/assets/images/favicon.png') }}" />
   </head>
@@ -382,5 +390,180 @@
             });
           });
     </script>
+    <script>
+        document.getElementById('cari-obat').addEventListener('click', function () {
+            var modalCariObat = new bootstrap.Modal(document.getElementById('modalCariObat'), {});
+            modalCariObat.show();
+        });
+
+        
+    </script>
+    <script>
+       $(document).ready(function () {
+        // Event untuk memilih obat dari tabel
+        $('.pilih-obat').on('click', function () {
+            // Ambil data nama obat dari atribut data-nama-obat
+            var namaObat = $(this).data('nama-obat');
+            
+            // Isi input dengan nama obat
+            $('#cari-obat').val(namaObat);
+              
+            // Tutup modal
+            $('#modalCariObat').modal('hide');
+        });
+    });
+    </script>
+
+<script>
+    $(document).ready(function () {
+        // Event untuk memilih obat dari tabel
+        $('.pilih-obat').on('click', function () {
+            // Ambil data dari atribut data pada baris yang dipilih
+            var namaObat = $(this).data('nama-obat');
+            var kodeObat = $(this).find('td:eq(1)').text();
+            var hargaJual = $(this).find('td:eq(3)').text();
+            var stok = $(this).find('td:eq(4)').text();
+
+             // Periksa apakah kode obat sudah ada di tabel
+             var isDuplicate = false;
+            $('#tabel-obat-terpilih tbody tr').each(function () {
+                var existingKodeObat = $(this).find('td:eq(1)').text();
+                if (existingKodeObat === kodeObat) {
+                    isDuplicate = true; // Jika ada duplikat, set menjadi true
+                    return false; // Hentikan iterasi
+                }
+            });
+
+            // Jika tidak ada duplikat, tambahkan data ke tabel
+            if (!isDuplicate) {
+                var rowCount = $('#tabel-obat-terpilih tbody tr').length + 1; // Hitung jumlah baris
+                var newRow = `
+                    <tr>
+                        <td>${rowCount}</td>
+                        <td>${kodeObat}</td>
+                        <td>${namaObat}</td>
+                        <td>${hargaJual}</td>
+                        <td>${stok}</td>
+                        <td>
+                            <div class="input-group">
+                                <button type="button" class="btn btn-sm btn-secondary btn-minus"></button>
+                                <span class="jumlah-obat">1</span>
+                              <button type="button" class="btn  btn-rounded  btn-sm btn-secondary btn-plus"></button>
+                            </div>
+                        </td>
+                        <td>
+                                <button type="button" class="btn btn-danger btn-sm btn-hapus">Hapus</button> <!-- Tombol Hapus -->
+                        </td>
+                    </tr>`;
+                $('#tabel-obat-terpilih tbody').append(newRow); // Tambahkan baris baru
+                updateTotal(); // Update total setelah menambahkan baris
+            } else {
+                alert('Obat dengan kode ini sudah ada di tabel!');
+            }
+
+            // Tutup modal
+            $('#modalCariObat').modal('hide');
+
+           
+        });
+
+           // Event untuk tombol - di kolom Jumlah
+           $(document).on('click', '.btn-minus', function () {
+                var span = $(this).siblings('.jumlah-obat');
+                var currentValue = parseInt(span.text());
+                if (currentValue > 1) {
+                    span.text(currentValue - 1); // Mengurangi nilai di span
+                    updateTotal(); // Update total setelah baris dihapus
+                }
+            });
+
+            // Event untuk tombol + di kolom Jumlah
+            $(document).on('click', '.btn-plus', function () {
+                var span = $(this).siblings('.jumlah-obat');
+                var currentValue = parseInt(span.text());
+                var stok = parseInt($(this).closest('tr').find('td:eq(4)').text()); // Ambil nilai stok dari kolom Stok
+
+                // Periksa apakah jumlah saat ini sudah mencapai stok
+                if (currentValue < stok) {
+                    span.text(currentValue + 1); // Menambah nilai di span
+                    updateTotal(); // Update total setelah perubahan jumlah
+                } else {
+                    alert('Jumlah tidak boleh lebih dari stok yang tersedia!'); // Peringatan jika jumlah melebihi stok
+                }
+                
+            });
+
+
+        $(document).on('click', '.btn-hapus', function () {
+                $(this).closest('tr').remove(); // Menghapus baris yang sesuai dengan tombol Hapus yang ditekan
+                updateTotal(); // Update total setelah baris dihapus
+        });
+
+        // Fungsi untuk menghitung total jumlah obat
+        function updateTotal() {
+                var total = 0;
+                $('#tabel-obat-terpilih tbody tr').each(function () {
+                    // var jumlah = parseInt($(this).find('.jumlah-obat').text());
+                    // var hargaJual = parseFloat($(this).find('td:eq(3)').text()); // Ambil harga jual
+                    // total += (jumlah * hargaJual); // Tambahkan hasil (jumlah x harga jual) ke total
+
+                    var jumlah = parseInt($(this).find('.jumlah-obat').text()); // Ambil jumlah dari span
+                    var hargaJual = parseInt($(this).find('td:eq(3)').text()); // Ambil harga jual dari kolom ke-3
+                    total += (jumlah * hargaJual);
+                });
+                $('#total-jumlah').text(formatRupiah(total));
+            }
+
+           // Fungsi untuk memformat angka ke dalam format Rupiah
+            function formatRupiah(angka) {
+                return 'Rp' + angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            }
+
+            $(document).ready(function () {
+    $('#beli-obat').on('click', function () {
+            var data = []; // Array untuk menyimpan data transaksi
+            $('#tabel-obat-terpilih tbody tr').each(function () {
+                var jumlah = parseInt($(this).find('.jumlah-obat').text()); // Jumlah dari span
+                var hargaJual = parseFloat($(this).find('td:eq(3)').text()); // Harga jual dari kolom ke-3
+                var total = hargaJual * jumlah; // Total per baris
+
+                // Tambahkan data ke array
+                data.push({
+                    obat: obat,
+                    jumlah: jumlah,
+                    total: total
+                });
+            });
+
+            // Kirim data ke backend menggunakan AJAX
+            if (data.length > 0) {
+                $.ajax({
+                    url: '/storetransaksiobat', // Endpoint Laravel
+                    method: 'POST',
+                    data: {
+                        transaksi: data,
+                        _token: $('meta[name="csrf-token"]').attr('content') // Token CSRF
+                    },
+                    success: function (response) {
+                        alert('Transaksi berhasil disimpan!');
+                        // Reset tabel jika perlu
+                        $('#tabel-obat-terpilih tbody').empty();
+                        updateTotal(); // Reset total
+                    },
+                    error: function (error) {
+                        alert('Terjadi kesalahan saat menyimpan transaksi!');
+                        console.error(error);
+                    }
+                });
+            } else {
+                alert('Tidak ada obat yang dipilih!');
+            }
+        });
+    });
+    });
+</script>
+scr
+
+   
   </body>
 </html>
