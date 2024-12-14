@@ -8,11 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 class Transaksi extends Model
 {
     use HasFactory;
-    protected $table="obats";
+    protected $table="transaksis";
 
     protected $fillable=[
         'total',
         'jumlah',
         'obat',
+        'pemeriksaan',
+        'kode_transaksi'
     ];
 }

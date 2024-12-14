@@ -423,6 +423,7 @@
             var kodeObat = $(this).find('td:eq(1)').text();
             var hargaJual = $(this).find('td:eq(3)').text();
             var stok = $(this).find('td:eq(4)').text();
+            var idObat= $(this).find('td:eq(0)').text()
 
              // Periksa apakah kode obat sudah ada di tabel
              var isDuplicate = false;
@@ -439,6 +440,7 @@
                 var rowCount = $('#tabel-obat-terpilih tbody tr').length + 1; // Hitung jumlah baris
                 var newRow = `
                     <tr>
+                   
                         <td>${rowCount}</td>
                         <td>${kodeObat}</td>
                         <td>${namaObat}</td>
@@ -467,31 +469,31 @@
            
         });
 
-           // Event untuk tombol - di kolom Jumlah
-           $(document).on('click', '.btn-minus', function () {
-                var span = $(this).siblings('.jumlah-obat');
-                var currentValue = parseInt(span.text());
-                if (currentValue > 1) {
-                    span.text(currentValue - 1); // Mengurangi nilai di span
-                    updateTotal(); // Update total setelah baris dihapus
-                }
-            });
+        // Event untuk tombol - di kolom Jumlah
+        $(document).on('click', '.btn-minus', function () {
+            var span = $(this).siblings('.jumlah-obat');
+            var currentValue = parseInt(span.text());
+            if (currentValue > 1) {
+                span.text(currentValue - 1); // Mengurangi nilai di span
+                updateTotal(); // Update total setelah baris dihapus
+            }
+        });
 
-            // Event untuk tombol + di kolom Jumlah
-            $(document).on('click', '.btn-plus', function () {
-                var span = $(this).siblings('.jumlah-obat');
-                var currentValue = parseInt(span.text());
-                var stok = parseInt($(this).closest('tr').find('td:eq(4)').text()); // Ambil nilai stok dari kolom Stok
+        // Event untuk tombol + di kolom Jumlah
+        $(document).on('click', '.btn-plus', function () {
+            var span = $(this).siblings('.jumlah-obat');
+            var currentValue = parseInt(span.text());
+            var stok = parseInt($(this).closest('tr').find('td:eq(4)').text()); // Ambil nilai stok dari kolom Stok
 
-                // Periksa apakah jumlah saat ini sudah mencapai stok
-                if (currentValue < stok) {
-                    span.text(currentValue + 1); // Menambah nilai di span
-                    updateTotal(); // Update total setelah perubahan jumlah
-                } else {
-                    alert('Jumlah tidak boleh lebih dari stok yang tersedia!'); // Peringatan jika jumlah melebihi stok
-                }
-                
-            });
+            // Periksa apakah jumlah saat ini sudah mencapai stok
+            if (currentValue < stok) {
+                span.text(currentValue + 1); // Menambah nilai di span
+                updateTotal(); // Update total setelah perubahan jumlah
+            } else {
+                alert('Jumlah tidak boleh lebih dari stok yang tersedia!'); // Peringatan jika jumlah melebihi stok
+            }
+            
+        });
 
 
         $(document).on('click', '.btn-hapus', function () {
@@ -503,66 +505,47 @@
         function updateTotal() {
                 var total = 0;
                 $('#tabel-obat-terpilih tbody tr').each(function () {
-                    // var jumlah = parseInt($(this).find('.jumlah-obat').text());
-                    // var hargaJual = parseFloat($(this).find('td:eq(3)').text()); // Ambil harga jual
-                    // total += (jumlah * hargaJual); // Tambahkan hasil (jumlah x harga jual) ke total
-
+                  
                     var jumlah = parseInt($(this).find('.jumlah-obat').text()); // Ambil jumlah dari span
                     var hargaJual = parseInt($(this).find('td:eq(3)').text()); // Ambil harga jual dari kolom ke-3
                     total += (jumlah * hargaJual);
                 });
                 $('#total-jumlah').text(formatRupiah(total));
-            }
+        }
 
-           // Fungsi untuk memformat angka ke dalam format Rupiah
-            function formatRupiah(angka) {
-                return 'Rp' + angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-            }
+        // Fungsi untuk memformat angka ke dalam format Rupiah
+        function formatRupiah(angka) {
+            return 'Rp' + angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        }
 
-            $(document).ready(function () {
-    $('#beli-obat').on('click', function () {
-            var data = []; // Array untuk menyimpan data transaksi
+          $('#beli-obat').on('click', function (event) {
+            event.preventDefault(); // Cegah form terkirim otomatis
+            var form = $(this).closest('form');
+
+            // Hapus input tersembunyi sebelumnya
+            form.find('.hidden-input').remove();
+
+            // Tambahkan input tersembunyi untuk setiap obat yang dipilih
             $('#tabel-obat-terpilih tbody tr').each(function () {
-                var jumlah = parseInt($(this).find('.jumlah-obat').text()); // Jumlah dari span
-                var hargaJual = parseFloat($(this).find('td:eq(3)').text()); // Harga jual dari kolom ke-3
-                var total = hargaJual * jumlah; // Total per baris
+                var kodeObat = $(this).find('td:eq(1)').text();
+                var jumlah = $(this).find('.jumlah-obat').text();
 
-                // Tambahkan data ke array
-                data.push({
-                    obat: obat,
-                    jumlah: jumlah,
-                    total: total
-                });
+                form.append(`
+                    <input type="hidden" name="kode_obat[]" value="${kodeObat}" class="hidden-input">
+                    <input type="hidden" name="jumlah[]" value="${jumlah}" class="hidden-input">
+                `);
             });
 
-            // Kirim data ke backend menggunakan AJAX
-            if (data.length > 0) {
-                $.ajax({
-                    url: '/storetransaksiobat', // Endpoint Laravel
-                    method: 'POST',
-                    data: {
-                        transaksi: data,
-                        _token: $('meta[name="csrf-token"]').attr('content') // Token CSRF
-                    },
-                    success: function (response) {
-                        alert('Transaksi berhasil disimpan!');
-                        // Reset tabel jika perlu
-                        $('#tabel-obat-terpilih tbody').empty();
-                        updateTotal(); // Reset total
-                    },
-                    error: function (error) {
-                        alert('Terjadi kesalahan saat menyimpan transaksi!');
-                        console.error(error);
-                    }
-                });
-            } else {
-                alert('Tidak ada obat yang dipilih!');
-            }
+            // Submit form
+            form.submit();
         });
-    });
+    
+       
+
+            
     });
 </script>
-scr
+
 
    
   </body>

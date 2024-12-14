@@ -13,12 +13,16 @@ return new class extends Migration
     {
         Schema::create('transaksis', function (Blueprint $table) {
             $table->id();
+            $table->string('kode_transaksi');
+
             $table->string('jumlah');
             $table->string('total');
 
             $table->unsignedBigInteger('obat');
- 
+            $table->unsignedBigInteger('pemeriksaan');
+
             $table->foreign('obat')->references('id')->on('obats')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreign('pemeriksaan')->references('id')->on('pemeriksaans')->onDelete('cascade')->onUpdate('cascade');
 
             $table->timestamps();
         });

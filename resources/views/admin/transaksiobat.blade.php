@@ -10,6 +10,9 @@
                     <p><strong>Nomor Rekam Medis:</strong> {{ $pemeriksaans->nomor_rekam_medis }}</p>
                     <p><strong>Nama Pasien:</strong> {{ $pemeriksaans->nama_pasien }}</p>
                     <p><strong>Tanggal Pemeriksaan:</strong> {{ $pemeriksaans->created_at }}</p>
+                    <p><strong>Tanggal Pemeriksaan:</strong> {{ $kode_transaksi }}</p>
+
+                    
 
                     <!-- <div class="form-group">
                         <label for="exampleInputName1">cari obat</label>
@@ -93,6 +96,7 @@
                         </table>
                         <form method="POST" action="/storetransaksiobat">
                             @csrf
+                            <input type="hidden" name="pemeriksaan" value="{{ $pemeriksaans->id }}">
                             <!-- Form Fields -->
                             <button type="submit" id="beli-obat"  class="btn btn-success">Beli Obat</button>
                         </form>
@@ -103,5 +107,6 @@
         </div>
     </div>
 </div>
+
 
 @endsection

@@ -94,14 +94,12 @@ class AdminController extends Controller
     }
 
     public function storepemeriksaan( Request $request){
- 
         Pemeriksaan::create([
             'pasien'    => $request->pasien,   // Ambil id pasien dari hidden input
             'berat_badan'  => $request->berat_badan,
             'tinggi_badan' =>  $request->tinggi_badan,
             'pelayanan'    =>  $request->pelayanan,
         ]);
-
         return redirect()->back()->with('success', 'Data pemeriksaan berhasil disimpan.');
     }
 
@@ -120,6 +118,7 @@ class AdminController extends Controller
         return view('admin.listdataobat',['obat'=>$obat]);
     }
     public function transaksiobat($id){
+        $kode_transaksi = $this->generatekodetransaksiobat();
         $pemeriksaans = DB::table('pemeriksaans')
         ->join('pasiens', 'pemeriksaans.pasien', '=', 'pasiens.id')
         ->select(
@@ -132,7 +131,7 @@ class AdminController extends Controller
         $obat = Obat::all();
 
         // return dd($pemeriksaan);
-        return view('admin.transaksiobat',['pemeriksaans'=>$pemeriksaans,'obat'=>$obat]);
+        return view('admin.transaksiobat',['pemeriksaans'=>$pemeriksaans,'obat'=>$obat,'kode_transaksi'=>$kode_transaksi]);
         
 
     }
@@ -153,12 +152,65 @@ class AdminController extends Controller
         return back()->with('success','data berhasil di simpan');
     }
 
-    public function storetransaksiobat(Request $request){
-        Transaksi::create([
-            'obat' => $request->obat,
-            'jumlah' => $request->jumlah,
-            'total' => $request->total,
-        ]);
-        return response()->json(['message' => 'Transaksi berhasil disimpan!']);
+    public function generatekodetransaksiobat(){
+        
+            // Buat kode transaksi
+            $currentYear = date('y'); // Ambil 2 digit terakhir dari tahun
+            $latestTransaction = Transaksi::whereYear('created_at', '=', date('Y'))
+                ->orderBy('kode_transaksi', 'desc')
+                ->first();
+
+            // Hitung angka urutan baru
+            $nextNumber = 1;
+            if ($latestTransaction) {
+                $latestKode = substr($latestTransaction->kode_transaksi, 3); // Ambil angka dari kode transaksi terakhir
+                $nextNumber = intval($latestKode) + 1;
+            }
+
+            // Format kode transaksi baru
+            $kodeTransaksi = sprintf('T%s%04d', $currentYear, $nextNumber);
+
+            return $kodeTransaksi;
     }
+    
+
+    public function storetransaksiobat(Request $request){
+        // Generate kode transaksi hanya sekali untuk batch transaksi ini
+        $kode_transaksi = $this->generatekodetransaksiobat();
+
+        // Loop melalui setiap obat yang dipilih
+        foreach ($request->kode_obat as $index => $kodeObat) {
+            // Cari data obat berdasarkan kode_obat
+            $obat = Obat::where('kode_obat', $kodeObat)->first();
+                if ($obat) {
+                    // Periksa apakah stok cukup
+                    $jumlah = (int)$request->jumlah[$index];
+                    if ($obat->stok >= $jumlah) {
+                        // Kurangi stok obat
+                        $obat->stok -= $jumlah;
+                        $obat->save();
+
+                        // Simpan transaksi ke tabel transaksi
+                        $transaksi =Transaksi::create([
+                            'kode_transaksi' => $kode_transaksi, // Gunakan kode transaksi yang sama untuk semua obat
+                            'obat' => $obat->id,
+                            'jumlah' => $jumlah,
+                            'total' => $jumlah * $obat->harga_jual,
+                            'pemeriksaan' => $request->input('pemeriksaan'), // Pastikan pemeriksaan_id tersedia
+                        ]);
+                    } else {
+                        return back()->withErrors([
+                            'stok' => "Stok obat '{$obat->nama_obat}' tidak mencukupi.",
+                        ]);
+                    }
+                }
+        }
+
+                    // Redirect ke halaman transaksi atau halaman sukses lainnya
+                    // return redirect()->route('transaksi.index')->with('success', 'Transaksi berhasil disimpan.');
+                    return dd($transaksi);
+    }
+    
+
+
 }
