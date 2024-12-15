@@ -117,14 +117,34 @@ class AdminController extends Controller
         $obat= Obat::all();  
         return view('admin.listdataobat',['obat'=>$obat]);
     }
+
+    public function listransaksiobat(){
+        $tranksaksi = DB::table('transaksis')
+        ->leftJoin('pemeriksaans', 'transaksis.pemeriksaan', '=', 'pemeriksaans.id')
+        ->leftJoin('pasiens', 'transaksis.pasien', '=', 'pasiens.id')
+        ->join('obats', 'transaksis.obat', '=', 'obats.id')
+        ->select(
+            'transaksis.*',
+            'pemeriksaans.*',
+            'pasiens.*',
+            'obats.*',
+        )
+        ->get();       
+        // return dd($tranksaksi);
+         return view('admin.listransaksiobat',['transaksi'=>$tranksaksi]);
+    }
+
     public function transaksiobat($id){
         $kode_transaksi = $this->generatekodetransaksiobat();
         $pemeriksaans = DB::table('pemeriksaans')
         ->join('pasiens', 'pemeriksaans.pasien', '=', 'pasiens.id')
         ->select(
             'pemeriksaans.*',
-            'pasiens.*',
-            // 'pasiens.nomor_rekam_medis'
+            'pasiens.nomor_rekam_medis',
+            'pasiens.nama_pasien',
+            'pasiens.id as id_pasien',
+            'pasiens.created_at'
+            // 'pasiens.id as pasiens.id_pasien',
         )
         ->where('pemeriksaans.id', $id)
         ->first();
@@ -197,6 +217,7 @@ class AdminController extends Controller
                             'jumlah' => $jumlah,
                             'total' => $jumlah * $obat->harga_jual,
                             'pemeriksaan' => $request->input('pemeriksaan'), // Pastikan pemeriksaan_id tersedia
+                            'pasien' => $request->input('pasien')
                         ]);
                     } else {
                         return back()->withErrors([

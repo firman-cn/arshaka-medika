@@ -14,6 +14,7 @@ class Transaksi extends Model
         'total',
         'jumlah',
         'obat',
+        'pasien',
         'pemeriksaan',
         'kode_transaksi'
     ];

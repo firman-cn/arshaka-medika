@@ -35,6 +35,8 @@ Route::get('/pemeriksaan', [AdminController::class, 'pemeriksaan'])->name('pemer
 Route::get('/carinorekammedis', [AdminController::class, 'carinorekammedis'])->name('carinorekammedis');
 Route::post('/storepemeriksaan', [AdminController::class, 'storepemeriksaan'])->name('storepemeriksaan');
                             // =====ROUTE PROCCES OBAT=====//
+Route::get('/listransaksiobat', [AdminController::class, 'listransaksiobat'])->name('listransaksiobat');
+
 Route::get('/listdataobat', [AdminController::class, 'listdataobat'])->name('listdataobat');
 Route::get('/tambahobat', [AdminController::class, 'tambahobat'])->name('tambahobat');
 

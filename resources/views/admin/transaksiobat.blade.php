@@ -97,6 +97,9 @@
                         <form method="POST" action="/storetransaksiobat">
                             @csrf
                             <input type="hidden" name="pemeriksaan" value="{{ $pemeriksaans->id }}">
+                            <input type="hidden" name="pasien" value="{{ $pemeriksaans->id_pasien }}">
+
+                            
                             <!-- Form Fields -->
                             <button type="submit" id="beli-obat"  class="btn btn-success">Beli Obat</button>
                         </form>

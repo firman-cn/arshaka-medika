@@ -20,9 +20,11 @@ return new class extends Migration
 
             $table->unsignedBigInteger('obat');
             $table->unsignedBigInteger('pemeriksaan');
+            $table->unsignedBigInteger('pasien');
 
             $table->foreign('obat')->references('id')->on('obats')->onDelete('cascade')->onUpdate('cascade');
             $table->foreign('pemeriksaan')->references('id')->on('pemeriksaans')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreign('pasien')->references('id')->on('pasiens')->onDelete('cascade')->onUpdate('cascade');
 
             $table->timestamps();
         });
