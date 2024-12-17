@@ -46,3 +46,7 @@ Route::get('/transaksiobat/{id}', [AdminController::class, 'transaksiobat'])->na
 Route::post('/storeobat', [AdminController::class, 'storeobat'])->name('storeobat');
 Route::post('/storetransaksiobat', [AdminController::class, 'storetransaksiobat'])->name('storetransaksiobat');
 
+Route::get('/cetaktransaksiobat/{kode_transaksi}', [AdminController::class, 'cetaktransaksiobat'])->name('cetaktransaksiobat');
+
+Route::post('updateHargaPelayanan/{id}', [AdminController::class, 'updateHargaPelayanan'])->name('updateHargaPelayanan');
+

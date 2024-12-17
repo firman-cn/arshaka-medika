@@ -7,6 +7,8 @@ use App\Models\Pemeriksaan;
 use App\Models\Obat;
 use App\Models\Transaksi;
 
+use TCPDF;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -119,17 +121,40 @@ class AdminController extends Controller
     }
 
     public function listransaksiobat(){
+        // $tranksaksi = DB::table('transaksis')
+        // ->leftJoin('pemeriksaans', 'transaksis.pemeriksaan', '=', 'pemeriksaans.id')
+        // ->leftJoin('pasiens', 'transaksis.pasien', '=', 'pasiens.id')
+        // ->join('obats', 'transaksis.obat', '=', 'obats.id')
+        // ->select(
+        //     'transaksis.*',
+        //     'pemeriksaans.*',
+        //     'pasiens.*',
+        //     'obats.*',
+        // )
+        // ->get();       
+
+        
         $tranksaksi = DB::table('transaksis')
-        ->leftJoin('pemeriksaans', 'transaksis.pemeriksaan', '=', 'pemeriksaans.id')
         ->leftJoin('pasiens', 'transaksis.pasien', '=', 'pasiens.id')
+        ->join('pemeriksaans', 'transaksis.pemeriksaan', '=', 'pemeriksaans.id')
         ->join('obats', 'transaksis.obat', '=', 'obats.id')
         ->select(
-            'transaksis.*',
-            'pemeriksaans.*',
-            'pasiens.*',
-            'obats.*',
+            'transaksis.kode_transaksi',
+            'transaksis.cetak',
+
+            'pasiens.nama_pasien as pasien_nama',
+            'pasiens.nomor_rekam_medis',
+            'pemeriksaans.pelayanan',
+
+
+            // 'pemeriksaans.nama as pemeriksaan_nama',
+            DB::raw('GROUP_CONCAT(obats.nama_obat SEPARATOR ", ") as daftar_obat'),
+            DB::raw('SUM(transaksis.total) as total_transaksi')
         )
-        ->get();       
+        ->groupBy('transaksis.kode_transaksi', 'pasiens.nama_pasien','pasiens.nomor_rekam_medis','pemeriksaans.pelayanan',            'transaksis.cetak',
+        )
+        ->get();
+
         // return dd($tranksaksi);
          return view('admin.listransaksiobat',['transaksi'=>$tranksaksi]);
     }
@@ -231,7 +256,139 @@ class AdminController extends Controller
                     // return redirect()->route('transaksi.index')->with('success', 'Transaksi berhasil disimpan.');
                     return dd($transaksi);
     }
+
+    public function cetaktransaksiobat($kode_transaksi){
+        DB::table('transaksis')
+        ->where('kode_transaksi', $kode_transaksi)
+        ->update(['cetak' => 'sudah cetak']);
+        
+        $transaksi = DB::table('transaksis')
+        ->leftJoin('pemeriksaans', 'transaksis.pemeriksaan', '=', 'pemeriksaans.id')
+        ->leftJoin('pasiens', 'transaksis.pasien', '=', 'pasiens.id')
+        ->join('obats', 'transaksis.obat', '=', 'obats.id')
+        ->select(
+            'transaksis.*',
+            'pemeriksaans.*',
+            'pasiens.*',
+            'obats.*',
+        )
+        ->where('transaksis.kode_transaksi', $kode_transaksi)
+        ->get();
+
+        // Hitung total harga obat
+        $totalHargaObat = $transaksi->sum('total');
+        // Ambil harga pelayanan (dari transaksi pertama)
+        $hargaPelayanan = $transaksi->first()->harga_pelayanan ?? 0;
+
+        
+    // Hitung total keseluruhan
+            $grandTotal = $totalHargaObat + $hargaPelayanan;
+
+        if ($transaksi->isEmpty()) {
+            return redirect()->back()->with('error', 'Transaksi tidak ditemukan.');
+        }
+        $data = $transaksi->first(); // Data transaksi pertama (umum)
+        $pdf = new TCPDF();
+        $pdf->SetCreator('Arshaka-Medika');
+        $pdf->SetAuthor('Arshaka-Medika');
+        $pdf->SetTitle('Nota Transaksi Obat');
+        $pdf->SetSubject('Nota Transaksi');
+    
+        // Tambah halaman baru
+        $pdf->AddPage();
+
+        $pdf->Image(public_path('admin_template/images/logo.png'), 55, 10, 20); // Path, X, Y, Width (30 mm)
+    
+        // Set judul dokumen
+        $pdf->SetFont('helvetica', 'B', 20);
+        $pdf->Cell(0, 10, 'Arshaka-Medika', 0, 1, 'C', 0, '', 0, false, 'T', 'M');
+        $pdf->SetFont('helvetica', 'B', 14);
+        $pdf->Cell(0, 10, 'Nota Transaksi Obat', 0, 1, 'C', 0, '', 0, false, 'T', 'M');
+
+        // Informasi transaksi
+        $pdf->SetFont('helvetica', '', 12);
+        $pdf->Ln(10);
+        $pdf->Cell(0, 10, 'Kode Transaksi: ' . $data->kode_transaksi, 0, 1);
+        $pdf->Cell(0, 10, 'Nama Pasien: ' . $data->nama_pasien, 0, 1);
+        $pdf->Cell(0, 10, 'Alamat: ' . $data->alamat, 0, 1);
+        // $pdf->Cell(0, 10, 'No. Telp: ' . $data->no_telp, 0, 1);
+        // $pdf->Cell(0, 10, 'Tanggal: ' . date('d-m-Y H:i:s', strtotime($data->tanggal_transaksi)), 0, 1);
+    
+        // Tabel obat yang dibeli
+        $pdf->Ln(10);
+        $pdf->SetFont('helvetica', 'B', 12);
+        $pdf->Cell(10, 10, 'No', 1, 0, 'C');
+        $pdf->Cell(60, 10, 'Nama Obat', 1, 0, 'C');
+        $pdf->Cell(30, 10, 'Harga Satuan', 1, 0, 'C');
+        $pdf->Cell(30, 10, 'Jumlah', 1, 0, 'C');
+        $pdf->Cell(30, 10, 'Subtotal', 1, 1, 'C');
+    
+        $pdf->SetFont('helvetica', '', 12);
+        $total = 0;
+        foreach ($transaksi as $index => $item) {
+            $subtotal = $item->jumlah * $item->harga_jual;
+            $total += $subtotal;
+    
+            $pdf->Cell(10, 10, $index + 1, 1, 0, 'C');
+            $pdf->Cell(60, 10, $item->nama_obat, 1, 0);
+            $pdf->Cell(30, 10, 'Rp ' . number_format($item->harga_jual, 0, ',', '.'), 1, 0, 'R');
+            $pdf->Cell(30, 10, $item->jumlah, 1, 0, 'C');
+            $pdf->Cell(30, 10, 'Rp ' . number_format($subtotal, 0, ',', '.'), 1, 1, 'R');
+        }
+    
+        // // Total
+        // $pdf->SetFont('helvetica', 'B', 12);
+        // $pdf->Cell(130, 10, 'Total', 1, 0, 'R');
+        // $pdf->Cell(30, 10, 'Rp ' . number_format($total, 0, ',', '.'), 1, 1, 'R');
+
+         // Harga Pelayanan
+    $pdf->Ln(5);
+    $pdf->SetFont('helvetica', 'B', 10);
+    $pdf->Cell(90, 10, 'Total Harga Obat', 0, 0, 'R');
+    $pdf->Cell(50, 10, 'Rp ' . number_format($totalHargaObat, 0, ',', '.'), 0, 1, 'R');
+
+    $pdf->Cell(90, 10, 'Harga Pelayanan', 0, 0, 'R');
+    $pdf->Cell(50, 10, 'Rp ' . number_format($hargaPelayanan, 0, ',', '.'), 0, 1, 'R');
+
+    $pdf->Cell(90, 10, 'Grand Total', 0, 0, 'R');
+    $pdf->Cell(50, 10, 'Rp ' . number_format($grandTotal, 0, ',', '.'), 0, 1, 'R');
+
+    
+        // Output PDF
+        $pdf->Output('nota-transaksi.pdf', 'I');
+    
+    }
+
+    public function updateHargaPelayanan(Request $request, $id)
+    {
+        // Validasi input
+        $request->validate([
+            'harga_pelayanan' => 'required|numeric|min:0',
+        ]);
+
+        try {
+            // Update kolom harga_pelayanan di database
+            DB::table('pemeriksaans')
+                ->where('id', $id)
+                ->update(['harga_pelayanan' => $request->harga_pelayanan]);
+
+            // Respon sukses
+            return response()->json([
+                'success' => true,
+                'message' => 'Harga pelayanan berhasil diperbarui.',
+            ]);
+        } catch (\Exception $e) {
+            // Respon error jika terjadi kesalahan
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat memperbarui harga pelayanan.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+}
+
+
     
 
 
-}

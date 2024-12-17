@@ -18,6 +18,7 @@
 
                                 <th>Pemeriksaan</th>
                                 <th>Obat</th>
+                                <th>Cetak</th>
                                 <th>Action</th>
                             </thead>
                             <tbody>
@@ -28,9 +29,21 @@
                                     <td>{{ $nomer ;}}</td>
                                     <td>{{ $t->kode_transaksi }}</td>
                                     <td>{{ $t->nomor_rekam_medis }}</td>
-                                    <td>{{ $t->nama_pasien }}</td>
+                                    {{-- <td>{{ $t->nama_pasien }}</td> --}}
+                                    <td>{{ $t->pasien_nama }}</td>
+
                                     <td>{{ $t->pelayanan }}</td>
-                                    <td>{{ $t->nama_obat }}</td>
+                                    {{-- <td>{{ $t->nama_obat }}</td> --}}
+                                    <td>
+                                        <!-- Daftar Obat -->
+                                        <ul>
+                                            @foreach (explode(',', $t->daftar_obat) as $obat)
+                                                <li>{{ $obat }}</li>
+                                            @endforeach
+                                        </ul>
+                                    </td>
+                                    <td>{{ $t->cetak }}</td>
+
                                     {{-- <td>
                                     <ul>
                                         @foreach(explode(', ', $t->daftar_obat) as $obat)
@@ -44,7 +57,7 @@
                                     
                                     <td>
                                         <button class="btn btn-primary"><i class=" mdi mdi-eye  "></i></button>
-                                        <button class="btn btn-primary"><i class=" mdi mdi-eye  ">print</i></button>
+                                        <a  target="_blank" href="{{ route('cetaktransaksiobat',$t->kode_transaksi) }}"class="btn btn-primary"><i class=" mdi mdi-eye  ">print</i></a>
 
                                         <button class="btn btn-danger"><i class="mdi mdi-delete"></i></button>
                                     </td>

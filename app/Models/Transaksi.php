@@ -15,6 +15,8 @@ class Transaksi extends Model
         'jumlah',
         'obat',
         'pasien',
+        'cetak',
+        'status',
         'pemeriksaan',
         'kode_transaksi'
     ];

@@ -15,6 +15,7 @@
                                 <th>Nomor Rekam Medis</th>
                                 <th>Nama Pasien</th>
                                 <th>Pelayanan</th>
+                                <th>Harga Pelayanan</th>
                                 <th>Action</th>
 
                             </thead>
@@ -25,9 +26,29 @@
                                     <td>  {{ $nomor ;  }}</td>
                                     <td>{{ $p->nomor_rekam_medis }}</td>    
                                     <td>{{ $p->nama_pasien }}</td>                              
-                                    <td>{{ $p->pelayanan }}</td>          
+                                    <td>{{ $p->pelayanan }}</td>   
                                     <td>
+                                        @if ($p->harga_pelayanan)
+                                        Rp {{ number_format($p->harga_pelayanan, 0, ',', '.') }}
+                                        @else
+                                            <input 
+                                            class="form-control"
+                                            type="text" 
+                                            name="harga_pelayanan" 
+                                            id="harga_pelayanan" 
+                                            placeholder="isi harga"
+                                            onkeydown="handleEnter(event, this, {{ $p->id }})">
+                                        @endif
+                                    </td>          
+       
+                                    <td>
+                                        @if ($p->harga_pelayanan)
                                         <a type="button" href="{{ route('transaksiobat',  $p->id )}}" class="btn btn-primary">Beli Obat</a>
+                                        @else 
+                                        <button type="button" class="btn btn-sm btn-secondary" onclick="alertHargaPelayanan()">
+                                            Obat
+                                        </button>
+                                        @endif
                                     </td>
                                 </tr>
                                 <?php $nomor++ ;?>

@@ -546,6 +546,45 @@
     });
 </script>
 
+<script>
+  function handleEnter(event, input, id) {
+    // Cek jika tombol yang ditekan adalah "Enter" (key code 13)
+    if (event.key === "Enter") {
+        event.preventDefault(); // Mencegah perilaku default form
+
+        const harga_pelayanan = input.value;
+
+        // Validasi input
+        if (!harga_pelayanan || harga_pelayanan <= 0) {
+            alert('Harga pelayanan tidak boleh kosong atau negatif.');
+            return;
+        }
+
+        // Kirim data ke server melalui AJAX
+        fetch(`/updateHargaPelayanan/${id}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            },
+            body: JSON.stringify({ harga_pelayanan: harga_pelayanan })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Harga pelayanan berhasil diperbarui.');
+                location.reload(); // Reload halaman agar perubahan terlihat
+            } else {
+                alert('Gagal memperbarui harga pelayanan.');
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+}
+
+
+</script>
+
 
    
   </body>

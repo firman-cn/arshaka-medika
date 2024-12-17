@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('tinggi_badan');
             $table->string('berat_badan');
             $table->string('pelayanan');
+            $table->string('harga_pelayanan')->nullable();
 
             $table->unsignedBigInteger('pasien');
  

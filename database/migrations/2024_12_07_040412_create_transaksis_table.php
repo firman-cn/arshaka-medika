@@ -17,7 +17,8 @@ return new class extends Migration
 
             $table->string('jumlah');
             $table->string('total');
-
+            $table->string('cetak')->default('belum cetak');
+            $table->string('status')->nullable();
             $table->unsignedBigInteger('obat');
             $table->unsignedBigInteger('pemeriksaan');
             $table->unsignedBigInteger('pasien');
