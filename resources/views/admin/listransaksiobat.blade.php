@@ -13,9 +13,7 @@
                                 <th>No</th>
                                 <th>Kode Transaksi</th>
                                 <th>Nomor Rekam Medis</th>
-
                                 <th>Nama Pasien</th>
-
                                 <th>Pemeriksaan</th>
                                 <th>Obat</th>
                                 <th>Cetak</th>
