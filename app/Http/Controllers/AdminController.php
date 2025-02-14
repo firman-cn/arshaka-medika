@@ -15,7 +15,13 @@ use Illuminate\Support\Facades\DB;
 class AdminController extends Controller
 {
     public function index(){
-        return view('admin.index');
+        $obat = DB::table('obats')->count();
+        $pasien = DB::table('pasiens')->count();
+        $pemeriksaan1= DB::table('pemeriksaans')
+                        ->where('status_pemeriksaan','belum diperiksa')
+                        ->count();
+
+        return view('admin.index',['obat'=>$obat,'pasien'=>$pasien,'pemeriksaan1'=>$pemeriksaan1]);
     }
 
 
@@ -100,6 +106,7 @@ class AdminController extends Controller
             'pasien'    => $request->pasien,   // Ambil id pasien dari hidden input
             'berat_badan'  => $request->berat_badan,
             'tinggi_badan' =>  $request->tinggi_badan,
+            // 'status_pemeriksaan'=>$request->status_pemeriksaan,
             'pelayanan'    =>  $request->pelayanan,
         ]);
         return redirect()->back()->with('success', 'Data pemeriksaan berhasil disimpan.');
@@ -121,18 +128,6 @@ class AdminController extends Controller
     }
 
     public function listransaksiobat(){
-        // $tranksaksi = DB::table('transaksis')
-        // ->leftJoin('pemeriksaans', 'transaksis.pemeriksaan', '=', 'pemeriksaans.id')
-        // ->leftJoin('pasiens', 'transaksis.pasien', '=', 'pasiens.id')
-        // ->join('obats', 'transaksis.obat', '=', 'obats.id')
-        // ->select(
-        //     'transaksis.*',
-        //     'pemeriksaans.*',
-        //     'pasiens.*',
-        //     'obats.*',
-        // )
-        // ->get();       
-
         
         $tranksaksi = DB::table('transaksis')
         ->leftJoin('pasiens', 'transaksis.pasien', '=', 'pasiens.id')
@@ -360,31 +355,30 @@ class AdminController extends Controller
     }
 
     public function updateHargaPelayanan(Request $request, $id)
+
     {
         // Validasi input
         $request->validate([
             'harga_pelayanan' => 'required|numeric|min:0',
         ]);
+        $pemeriksaan = DB::table('pemeriksaans')
+        ->where('status_pemeriksaan', 'belum diperiksa') // Pastikan hanya yang belum diperiksa
+        ->latest('created_at') // Urutkan dari yang terbar
+        ->first();
 
-        try {
-            // Update kolom harga_pelayanan di database
+
+        if ($pemeriksaan) {
             DB::table('pemeriksaans')
-                ->where('id', $id)
-                ->update(['harga_pelayanan' => $request->harga_pelayanan]);
-
-            // Respon sukses
-            return response()->json([
-                'success' => true,
-                'message' => 'Harga pelayanan berhasil diperbarui.',
-            ]);
-        } catch (\Exception $e) {
-            // Respon error jika terjadi kesalahan
-            return response()->json([
-                'success' => false,
-                'message' => 'Terjadi kesalahan saat memperbarui harga pelayanan.',
-                'error' => $e->getMessage(),
-            ], 500);
+                ->where('id', $pemeriksaan->id)
+                ->update([
+                    'harga_pelayanan' => $request->harga_pelayanan,
+                    'status_pemeriksaan' => 'sudah diperiksa',
+                    'updated_at' => now()
+                ]);
+    
+            return response()->json(['success' => true, 'message' => 'Harga pelayanan diperbarui'], 200);
         }
+        
     }
 }
 

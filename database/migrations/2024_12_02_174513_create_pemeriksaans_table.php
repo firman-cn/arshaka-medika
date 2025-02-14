@@ -13,9 +13,10 @@ return new class extends Migration
     {
         Schema::create('pemeriksaans', function (Blueprint $table) {
             $table->id();
-            $table->string('tinggi_badan');
-            $table->string('berat_badan');
-            $table->string('pelayanan');
+            $table->string('tinggi_badan')->nullable();
+            $table->string('berat_badan')->nullable();
+            $table->string('pelayanan')->nullable();
+            $table->string('status_pemeriksaan')->default('belum diperiksa');
             $table->string('harga_pelayanan')->nullable();
 
             $table->unsignedBigInteger('pasien');

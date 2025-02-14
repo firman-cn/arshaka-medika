@@ -14,6 +14,7 @@ class Pemeriksaan extends Model
     'tinggi_badan',
     'berat_badan',
     'pelayanan',
+    'status_pemeriksaan',
     'harga_pelayanan',
 
     'pasien',

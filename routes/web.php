@@ -50,3 +50,4 @@ Route::get('/cetaktransaksiobat/{kode_transaksi}', [AdminController::class, 'cet
 
 Route::post('updateHargaPelayanan/{id}', [AdminController::class, 'updateHargaPelayanan'])->name('updateHargaPelayanan');
 
+// Route::post('/updateHargaPelayanan', [AdminController::class, 'updateHargaPelayanan'])->name('updateHargaPelayanan');

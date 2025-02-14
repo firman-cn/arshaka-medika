@@ -15,6 +15,8 @@
                                 <th>Nomor Rekam Medis</th>
                                 <th>Nama Pasien</th>
                                 <th>Pelayanan</th>
+                                <th>Status Pemeriksaan</th>
+
                                 <th>Harga Pelayanan</th>
                                 <th>Action</th>
 
@@ -26,7 +28,16 @@
                                     <td>  {{ $nomor ;  }}</td>
                                     <td>{{ $p->nomor_rekam_medis }}</td>    
                                     <td>{{ $p->nama_pasien }}</td>                              
-                                    <td>{{ $p->pelayanan }}</td>   
+                                    <td>{{ $p->pelayanan }}</td> 
+                                    <!-- <td>{{ $p->status_pemeriksaan }}</td>  -->
+                                    <td>
+                                        @if ($p->status_pemeriksaan == 'belum diperiksa')
+                                            <span class="badge badge-outline-danger">Belum Diperiksa</span>
+                                        @else
+                                            <span class="badge badge-outline-success">Sudah Diperiksa</span>
+                                        @endif
+                                    </td> 
+
                                     <td>
                                         @if ($p->harga_pelayanan)
                                         Rp {{ number_format($p->harga_pelayanan, 0, ',', '.') }}
@@ -36,8 +47,9 @@
                                             type="text" 
                                             name="harga_pelayanan" 
                                             id="harga_pelayanan" 
-                                            placeholder="isi harga"
+                                            placeholder="isi harga"   
                                             onkeydown="handleEnter(event, this, {{ $p->id }})">
+                                            
                                         @endif
                                     </td>          
        

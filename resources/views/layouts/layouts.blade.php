@@ -562,6 +562,7 @@
 
         // Kirim data ke server melalui AJAX
         fetch(`/updateHargaPelayanan/${id}/`, {
+
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
