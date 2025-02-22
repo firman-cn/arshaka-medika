@@ -40,6 +40,8 @@ Route::get('/listransaksiobat', [AdminController::class, 'listransaksiobat'])->n
 Route::get('/listdataobat', [AdminController::class, 'listdataobat'])->name('listdataobat');
 Route::get('/tambahobat', [AdminController::class, 'tambahobat'])->name('tambahobat');
 
+Route::post('updatestok/{id}', [AdminController::class, 'updatestok'])->name('updatestok');
+
 Route::get('/transaksiobat/{id}', [AdminController::class, 'transaksiobat'])->name('transaksiobat');
 // Route::get('/transaksiobat', [AdminController::class, 'transaksiobat'])->name('transaksiobat');
 
