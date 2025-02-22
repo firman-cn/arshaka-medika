@@ -6,7 +6,7 @@
         <div class="col-12 grid-margin stretch-card">
             <div class="card">
                 <div class="card-body">
-                    <h6> List Data Pasien</h6>
+                    <h6> List Data Transaksi Obat</h6>
                     <div class="table-responsive">
                         <table class="table table-hover">
                             <thead>
@@ -31,9 +31,7 @@
                                     <td>{{ $t->pasien_nama }}</td>
 
                                     <td>{{ $t->pelayanan }}</td>
-                                    {{-- <td>{{ $t->nama_obat }}</td> --}}
                                     <td>
-                                        <!-- Daftar Obat -->
                                         <ul>
                                             @foreach (explode(',', $t->daftar_obat) as $obat)
                                                 <li>{{ $obat }}</li>
@@ -42,20 +40,15 @@
                                     </td>
                                     <td>{{ $t->cetak }}</td>
 
-                                    {{-- <td>
-                                    <ul>
-                                        @foreach(explode(', ', $t->daftar_obat) as $obat)
-                                            <li>{{ $obat }}</li>
-                                        @endforeach
-                                    </ul>
-                                   
-                                    </td> --}}
-                                    {{-- <td>Rp {{ number_format($t->total_harga, 0, ',', '.') }}</td> --}}
+                                  
                                        
                                     
                                     <td>
                                         <button class="btn btn-primary"><i class=" mdi mdi-eye  "></i></button>
-                                        <a  target="_blank" href="{{ route('cetaktransaksiobat',$t->kode_transaksi) }}"class="btn btn-primary"><i class=" mdi mdi-eye  ">print</i></a>
+                                        <a  target="_blank" href="{{ route('cetaktransaksiobat',$t->kode_transaksi) }} "class="btn btn-primary" @if($t->cetak != "sudah cetak") disabled @endif>
+                                            <i class=" mdi mdi-transaction  ">print</i>
+
+                                        </a>
 
                                         <button class="btn btn-danger"><i class="mdi mdi-delete"></i></button>
                                     </td>
@@ -69,8 +62,11 @@
                     </div>
                 </div>
             </div>
+
+            
         </div>
     </div>
+  
 </div>
 
 @endsection

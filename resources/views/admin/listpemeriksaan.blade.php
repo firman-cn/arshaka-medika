@@ -16,7 +16,6 @@
                                 <th>Nama Pasien</th>
                                 <th>Pelayanan</th>
                                 <th>Status Pemeriksaan</th>
-
                                 <th>Harga Pelayanan</th>
                                 <th>Action</th>
 

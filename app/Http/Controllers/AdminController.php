@@ -14,6 +14,16 @@ use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
 {
+    /**
+     * Create a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
     public function index(){
         $obat = DB::table('obats')->count();
         $pasien = DB::table('pasiens')->count();
@@ -112,19 +122,42 @@ class AdminController extends Controller
         return redirect()->back()->with('success', 'Data pemeriksaan berhasil disimpan.');
     }
 
-                 // ======= OBAT ======== //
-    public function tambahobat(){
-        $lastRecord = DB::table('obats')->latest('kode_obat')->first();
 
-        $currentYear = now()->format('y'); // Ambil 2 digit tahun saat ini (contoh: '24' untuk 2024)
-        $lastNumber = $lastRecord ? (int)substr($lastRecord->kode_obat, 2) : 0; // Ambil angka urut dari nomor terakhir
-        $newNumber = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT); // Tambahkan 1 dan format jadi 4 digit
-        $newKodeObat = 'K'.$currentYear . $newNumber;
+                 // ======= OBAT ======== //
+    public function generatekodeobat()
+    {
+        // Ambil 2 digit terakhir dari tahun
+        $currentYear = date('y'); 
+    
+        // Ambil transaksi terakhir untuk tahun berjalan
+        $latestTransaction = Obat::whereYear('created_at', '=', date('Y'))
+            ->where('kode_obat', 'LIKE', "T{$currentYear}%") // Pastikan hanya transaksi tahun ini
+            ->orderBy('kode_obat', 'desc')
+            ->first();
+    
+        // Hitung angka urutan baru
+        $nextNumber = 1;
+        if ($latestTransaction) {
+            // Ambil bagian angka dari kode transaksi terakhir (4 digit terakhir)
+            $latestKode = intval(substr($latestTransaction->kode_obat, -4));
+            $nextNumber = $latestKode + 1;
+        }
+    
+        // Format kode transaksi baru dengan 4 digit angka
+        $kode_obat = sprintf('K%s%04d', $currentYear, $nextNumber);
+    
+        return $kode_obat;
+    }
+
+    public function tambahobat(){
+        $newKodeObat = $this->generatekodeobat();
+
         return view('admin.tambahobat',['newKodeObat'=>$newKodeObat]);
     }
+
     public function listdataobat(){
-        $obat= Obat::all();  
-        return view('admin.listdataobat',['obat'=>$obat]);
+        $obat = Obat::orderByRaw('stok <= 5 DESC')->orderBy('stok', 'ASC')->get();
+                return view('admin.listdataobat',['obat'=>$obat]);
     }
 
     public function listransaksiobat(){
@@ -146,8 +179,10 @@ class AdminController extends Controller
             DB::raw('GROUP_CONCAT(obats.nama_obat SEPARATOR ", ") as daftar_obat'),
             DB::raw('SUM(transaksis.total) as total_transaksi')
         )
+        // ->where('transaksis.cetak', 'sudah cetak') // Tambahkan kondisi ini
         ->groupBy('transaksis.kode_transaksi', 'pasiens.nama_pasien','pasiens.nomor_rekam_medis','pemeriksaans.pelayanan',            'transaksis.cetak',
         )
+        ->orderByRaw("CASE WHEN transaksis.cetak = 'belum cetak' THEN 0 ELSE 1 END") // Menempatkan "belum cetak" di atas
         ->get();
 
         // return dd($tranksaksi);
@@ -192,27 +227,38 @@ class AdminController extends Controller
         return back()->with('success','data berhasil di simpan');
     }
 
-    public function generatekodetransaksiobat(){
-        
-            // Buat kode transaksi
-            $currentYear = date('y'); // Ambil 2 digit terakhir dari tahun
-            $latestTransaction = Transaksi::whereYear('created_at', '=', date('Y'))
-                ->orderBy('kode_transaksi', 'desc')
-                ->first();
-
-            // Hitung angka urutan baru
-            $nextNumber = 1;
-            if ($latestTransaction) {
-                $latestKode = substr($latestTransaction->kode_transaksi, 3); // Ambil angka dari kode transaksi terakhir
-                $nextNumber = intval($latestKode) + 1;
-            }
-
-            // Format kode transaksi baru
-            $kodeTransaksi = sprintf('T%s%04d', $currentYear, $nextNumber);
-
-            return $kodeTransaksi;
-    }
+    public function updatestok(Request $request, $id){
+        $obat = Obat::findOrFail($id);
+        $obat->stok = $request->stok;
+        $obat->save();
     
+        return response()->json(['success' => true, 'stok' => $obat->stok]);
+    }
+
+   public function generatekodetransaksiobat()
+{
+    // Ambil 2 digit terakhir dari tahun
+    $currentYear = date('y'); 
+
+    // Ambil transaksi terakhir untuk tahun berjalan
+    $latestTransaction = Transaksi::whereYear('created_at', '=', date('Y'))
+        ->where('kode_transaksi', 'LIKE', "T{$currentYear}%") // Pastikan hanya transaksi tahun ini
+        ->orderBy('kode_transaksi', 'desc')
+        ->first();
+
+    // Hitung angka urutan baru
+    $nextNumber = 1;
+    if ($latestTransaction) {
+        // Ambil bagian angka dari kode transaksi terakhir (4 digit terakhir)
+        $latestKode = intval(substr($latestTransaction->kode_transaksi, -4));
+        $nextNumber = $latestKode + 1;
+    }
+
+    // Format kode transaksi baru dengan 4 digit angka
+    $kodeTransaksi = sprintf('T%s%04d', $currentYear, $nextNumber);
+
+    return $kodeTransaksi;
+}
 
     public function storetransaksiobat(Request $request){
         // Generate kode transaksi hanya sekali untuk batch transaksi ini
@@ -276,8 +322,8 @@ class AdminController extends Controller
         $hargaPelayanan = $transaksi->first()->harga_pelayanan ?? 0;
 
         
-    // Hitung total keseluruhan
-            $grandTotal = $totalHargaObat + $hargaPelayanan;
+        // Hitung total keseluruhan
+        $grandTotal = $totalHargaObat + $hargaPelayanan;
 
         if ($transaksi->isEmpty()) {
             return redirect()->back()->with('error', 'Transaksi tidak ditemukan.');
@@ -330,23 +376,20 @@ class AdminController extends Controller
             $pdf->Cell(30, 10, $item->jumlah, 1, 0, 'C');
             $pdf->Cell(30, 10, 'Rp ' . number_format($subtotal, 0, ',', '.'), 1, 1, 'R');
         }
-    
-        // // Total
-        // $pdf->SetFont('helvetica', 'B', 12);
-        // $pdf->Cell(130, 10, 'Total', 1, 0, 'R');
-        // $pdf->Cell(30, 10, 'Rp ' . number_format($total, 0, ',', '.'), 1, 1, 'R');
+        
+        
 
-         // Harga Pelayanan
-    $pdf->Ln(5);
-    $pdf->SetFont('helvetica', 'B', 10);
-    $pdf->Cell(90, 10, 'Total Harga Obat', 0, 0, 'R');
-    $pdf->Cell(50, 10, 'Rp ' . number_format($totalHargaObat, 0, ',', '.'), 0, 1, 'R');
+            // Harga Pelayanan
+        $pdf->Ln(5);
+        $pdf->SetFont('helvetica', 'B', 10);
+        $pdf->Cell(90, 10, 'Total Harga Obat', 0, 0, 'R');
+        $pdf->Cell(50, 10, 'Rp ' . number_format($totalHargaObat, 0, ',', '.'), 0, 1, 'R');
 
-    $pdf->Cell(90, 10, 'Harga Pelayanan', 0, 0, 'R');
-    $pdf->Cell(50, 10, 'Rp ' . number_format($hargaPelayanan, 0, ',', '.'), 0, 1, 'R');
+        $pdf->Cell(90, 10, 'Harga Pelayanan', 0, 0, 'R');
+        $pdf->Cell(50, 10, 'Rp ' . number_format($hargaPelayanan, 0, ',', '.'), 0, 1, 'R');
 
-    $pdf->Cell(90, 10, 'Grand Total', 0, 0, 'R');
-    $pdf->Cell(50, 10, 'Rp ' . number_format($grandTotal, 0, ',', '.'), 0, 1, 'R');
+        $pdf->Cell(90, 10, 'Grand Total', 0, 0, 'R');
+        $pdf->Cell(50, 10, 'Rp ' . number_format($grandTotal, 0, ',', '.'), 0, 1, 'R');
 
     
         // Output PDF

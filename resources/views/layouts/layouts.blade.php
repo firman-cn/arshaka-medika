@@ -582,10 +582,72 @@
         .catch(error => console.error('Error:', error));
     }
 }
-
-
 </script>
 
+<script>
+    $(document).ready(function () {
+        $(".updatestok").each(function () {
+            let stokTd = $(this).closest("tr").find("td:nth-child(7)"); // Ambil kolom stok
+            let stok = parseInt(stokTd.text().trim()); // Ambil nilai stok
+
+            // Jika stok kurang dari atau sama dengan 5, aktifkan tombol
+            if (stok <= 5) {
+                $(this).prop("disabled", false);
+            }
+        });
+
+        $(".updatestok").click(function () {
+            let stokTd = $(this).closest("tr").find("td:nth-child(7)"); // Kolom stok
+            let currentStock = stokTd.text().trim(); // Ambil stok saat ini
+
+            // Ubah teks stok menjadi inputan
+            stokTd.html(`<input type="text" class="form-control stok-input" value="${currentStock}">`);
+
+            // // Matikan tombol setelah diklik untuk menghindari duplikasi
+            // $(this).prop("disabled", true);
+
+            
+            // Fokus ke input stok
+            stokTd.find(".stok-input").focus();
+
+        });
+
+         // Event saat menekan tombol Enter di input stok
+         $(document).on("keypress", ".stok-input", function (e) {
+            if (e.which === 13) { // Cek jika tombol Enter ditekan
+                let inputField = $(this);
+                let newStock = parseInt(inputField.val().trim()); // Ambil nilai baru
+                let stokTd = inputField.closest(".stok-td"); // Kolom stok
+                let obatId = stokTd.data("id"); // ID Obat
+
+                // Validasi stok minimal 5
+                if (newStock < 5) {
+                    alert("Stok kurang dari 5!");
+                    return;
+                }
+
+                // Kirim data ke server menggunakan AJAX
+                $.ajax({
+                    url: "/updatestok/" + obatId,
+                    type: "POST",
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                        stok: newStock
+                    },
+                    success: function (response) {
+                        // Jika berhasil, update tampilan
+                        stokTd.html(newStock);
+                        $(".updatestok[data-id='" + obatId + "']").prop("disabled", newStock > 5);
+                    },
+                    error: function () {
+                        alert("Gagal memperbarui stok!");
+                    }
+                });
+            }
+        });
+
+    });
+</script>
 
    
   </body>

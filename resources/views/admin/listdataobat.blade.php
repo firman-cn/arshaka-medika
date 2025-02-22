@@ -18,6 +18,8 @@
 
                                 <th>Harga Jual</th>
                                 <th>Jenis Obat</th>
+                                <th>Stok</th>
+
                                 <th>Action</th>
                             </thead>
                             <tbody>
@@ -32,6 +34,8 @@
 
                                     <td>{{ $o->harga_jual }}</td>
                                     <td>{{ $o->jenis_obat }}</td>
+                                    <!-- <td>{{ $o->stok }}</td> -->
+                                    <td class="stok-td" data-id="{{ $o->id }}">{{ $o->stok }}</td>
                                     <td>
                                         <button class="btn btn-success" data-toggle="modal" data-target="#editObatModal{{ $o->id }}" aria-labelledby="editObatModal{{ $o->id }}"><i class="mdi mdi-lead-pencil "></i></button>
                                             <!-- Edit Pasien Modal -->
@@ -88,7 +92,10 @@
 
                                         
                                         <button class="btn btn-primary"><i class=" mdi mdi-eye  "></i></button>
-
+                                        <!-- <button class="btn btn-primary" id="updatestok" disabled><i class=" mdi mdi-plus  "></i></button> -->
+                                        <button class="btn btn-primary updatestok" data-id="{{ $o->id }}" 
+                                        @if($o->stok > 5) disabled @endif>
+                                        </button>
                                         <button class="btn btn-danger"><i class="mdi mdi-delete"></i></button>
                                     </td>
                                 </tr>
