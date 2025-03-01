@@ -14,14 +14,26 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Route::get('/', function () {
+//     return view('welcome');
+// });
 
 Auth::routes();
+
+// Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
                         // ==== ROUTE VIEW === //
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-Route::get('/index', [AdminController::class, 'index'])->name('index');
+
+Route::middleware(['auth', 'role:admin|superadmin'])->group(function () {
+    Route::get('/index', [AdminController::class, 'index'])->name('index');
+
+});
+
+Route::middleware(['auth', 'role:member'])->group(function () {
+    Route::get('/welcome', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+    Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+});
+
 Route::get('/listdatapasien', [AdminController::class, 'listdatapasien'])->name('listdatapasien');
 Route::get('/tambahpasien', [AdminController::class, 'tambahpasien'])->name('tambahpasien');
 

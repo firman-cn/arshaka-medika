@@ -172,14 +172,22 @@
               </ul>
             </div>
           </li>
+          
+          @auth
           <li class="nav-item menu-items">
-            <a class="nav-link" href="http://www.bootstrapdash.com/demo/corona-free/jquery/documentation/documentation.html">
+            <a class="nav-link" href="{{ route('logout') }}"
+                onclick="event.preventDefault();
+                document.getElementById('logout-form').submit()">
               <span class="menu-icon">
-                <i class="mdi mdi-file-document-box"></i>
+                <i class="mdi mdi-logout"></i>
               </span>
-              <span class="menu-title">Documentation</span>
+              <span class="menu-title">Logout</span>
             </a>
+            <form  id="logout-form"action="{{ route('logout') }}" method="POST" class="d-none">
+                  @csrf
+                </form>
           </li>
+          @endauth
         </ul>
       </nav>
       <!-- partial -->

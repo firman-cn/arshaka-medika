@@ -10,6 +10,7 @@ use App\Models\Transaksi;
 use TCPDF;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
@@ -25,13 +26,21 @@ class AdminController extends Controller
     }
 
     public function index(){
+
+
         $obat = DB::table('obats')->count();
         $pasien = DB::table('pasiens')->count();
         $pemeriksaan1= DB::table('pemeriksaans')
                         ->where('status_pemeriksaan','belum diperiksa')
                         ->count();
-
-        return view('admin.index',['obat'=>$obat,'pasien'=>$pasien,'pemeriksaan1'=>$pemeriksaan1]);
+        $user = Auth::user();
+        if ($user->hasRole('superadmin')) {
+            return view('admin.index',['obat'=>$obat,'pasien'=>$pasien,'pemeriksaan1'=>$pemeriksaan1]);
+        } elseif ($user->hasRole('admin')) {
+            return view('admin.index',['obat'=>$obat,'pasien'=>$pasien,'pemeriksaan1'=>$pemeriksaan1]);
+        } else {
+            return redirect('/home'); // Default jika role tidak terdefinisi
+        }
     }
 
 
