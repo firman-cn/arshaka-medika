@@ -6,12 +6,14 @@ use App\Models\Pasien;
 use App\Models\Pemeriksaan;
 use App\Models\Obat;
 use App\Models\Transaksi;
-
+use App\Models\User;
+use Spatie\Permission\Models\Role;
 use TCPDF;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class AdminController extends Controller
 {
@@ -42,7 +44,62 @@ class AdminController extends Controller
             return redirect('/home'); // Default jika role tidak terdefinisi
         }
     }
+    // ======== USER ======= //
+    public function tambahuser(){
 
+        // Ambil user yang sedang login
+    $user = Auth::user();
+
+    // Cek apakah user yang login adalah admin
+    if ($user->hasRole('admin')) {
+        $role = Role::whereIn('name', ['dokter', 'member'])->get();
+        $user = User::whereHas('roles', function ($query) {
+            $query->whereNotIn('name', ['superadmin']); // Filter superadmin
+        })->get();
+    } else {
+        $role = Role::all(); // Jika superadmin, tampilkan semua role
+        $user = User::all();
+    }
+
+        return view('user.tambahuser',compact('role','user'));
+    }
+
+    public function storeuser(Request $request){
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required',
+            'password' => 'required',
+            'role' => 'required', // Role wajib dipilih
+        ]);
+
+        $user= User::create([
+            'name' => $request->name,
+            'password' => Hash::make($request->password), // Hash password dengan bcrypt            
+            'email'=>$request->email,
+        ]);
+
+        $user->assignRole($request->role);
+        return redirect()->route('index')->with('success', 'User berhasil ditambahkan!');
+    }
+
+    public function updateuser(Request $request,$id){
+        $user = User::findOrFail($id);
+    
+        $user->update([
+            'name' => $request->name,
+            'email' => $request->email,
+        ]);
+    
+        // Update Role
+        if ($request->role) {
+            $user->syncRoles([$request->role]);
+        }
+        return redirect()->back()->with('success', 'User berhasil diperbarui.');
+    }
+
+    public function deleteuser(){
+
+    }
 
     // ======== PASIEN ======= //
     public function tambahpasien(){

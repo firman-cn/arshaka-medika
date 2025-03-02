@@ -54,8 +54,8 @@
                   <span class="count bg-success"></span>
                 </div>
                 <div class="profile-name">
-                  <h5 class="mb-0 font-weight-normal">Henry Klein</h5>
-                  <span>Gold Member</span>
+                  <h5 class="mb-0 font-weight-normal">{{ Auth::user()->name }}</h5>
+                  <span>{{ Auth::user()->roles->pluck('name')->first() }}</span>
                 </div>
               </div>
               <a href="#" id="profile-dropdown" data-toggle="dropdown"><i class="mdi mdi-dots-vertical"></i></a>
@@ -95,6 +95,18 @@
               </div>
             </div>
           </li>
+          <li class="nav-item nav-category">
+            <span class="nav-link">Data</span>
+          </li>
+          <li class="nav-item menu-items">
+            <a class="nav-link" href="{{route('tambahuser')}}">
+              <span class="menu-icon">
+                <i class="mdi mdi-contacts"></i>
+              </span>
+              <span class="menu-title">Tambah User</span>
+            </a>
+          </li>
+
           <li class="nav-item nav-category">
             <span class="nav-link">Navigation</span>
           </li>
@@ -146,6 +158,7 @@
               <span class="menu-title">Charts</span>
             </a>
           </li>
+          
           <li class="nav-item menu-items">
             <a class="nav-link" href="pages/icons/mdi.html">
               <span class="menu-icon">
@@ -171,6 +184,9 @@
                 <li class="nav-item"> <a class="nav-link" href="pages/samples/register.html"> Register </a></li>
               </ul>
             </div>
+          </li>
+          <li class="nav-item nav-category">
+            <span class="nav-link">Account</span>
           </li>
           
           @auth
@@ -656,6 +672,7 @@
 
     });
 </script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
    
   </body>

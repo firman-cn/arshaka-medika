@@ -33,7 +33,7 @@
                             <form action="{{ route('storepemeriksaan') }}" method="post">
                                 @csrf
                                 <h5 class="card-title"> BB TB</h5>
-                                <input type="input" name="pasien" id="pasien">
+                                <input type="input" name="pasien" id="pasien" hidden>
                                 <div class="form-group">
                                     <div class="input-group">
                                         <div class="col-md-4">

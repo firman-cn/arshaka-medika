@@ -25,6 +25,12 @@ Auth::routes();
                         // ==== ROUTE VIEW === //
 
 Route::middleware(['auth', 'role:admin|superadmin'])->group(function () {
+    Route::get('/tambahuser', [AdminController::class, 'tambahuser'])->name('tambahuser');
+    Route::post('/storeuser', [AdminController::class, 'storeuser'])->name('storeuser');
+    Route::put('/updateuser/{$id}',[AdminController::class,'updateuser'])->name('updateuser');
+});                        
+
+Route::middleware(['auth', 'role:admin|superadmin'])->group(function () {
     Route::get('/index', [AdminController::class, 'index'])->name('index');
 
 });
