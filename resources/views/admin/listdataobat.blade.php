@@ -23,10 +23,14 @@
                                 <th>Action</th>
                             </thead>
                             <tbody>
-                                <?php $nomer=1; ?>
-                                @foreach ($obat as $o)
+                                <?php $nomer=1; 
+                                 $obatUrgent = $obat->where('stok', '<=', 5);
+                                 $obatLain = $obat->where('stok', '>', 5);
+                                 $sortedObat = $obatUrgent->merge($obatLain);
+                                ?>
+                                @foreach ($sortedObat as $o)
                                     
-                                <tr>
+                                <tr class="{{ $o->stok <= 5 ? 'bg-danger text-white' : '' }}">
                                     <td>{{ $nomer ;}}</td>
                                     <td>{{ $o->kode_obat }}</td>
                                     <td>{{ $o->nama_obat }}</td>
@@ -35,7 +39,7 @@
                                     <td>{{ $o->harga_jual }}</td>
                                     <td>{{ $o->jenis_obat }}</td>
                                     <!-- <td>{{ $o->stok }}</td> -->
-                                    <td class="stok-td" data-id="{{ $o->id }}">{{ $o->stok }}</td>
+                                    <td class="stok-td  {{ $o->stok <= 5 ? 'text-muted' : '' }}" data-id="{{ $o->id }}">{{ $o->stok }}</td>
                                     <td>
                                         <button class="btn btn-success" data-toggle="modal" data-target="#editObatModal{{ $o->id }}" aria-labelledby="editObatModal{{ $o->id }}"><i class="mdi mdi-lead-pencil "></i></button>
                                             <!-- Edit Pasien Modal -->

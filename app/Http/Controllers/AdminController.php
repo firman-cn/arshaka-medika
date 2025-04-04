@@ -190,6 +190,7 @@ class AdminController extends Controller
 
 
                  // ======= OBAT ======== //
+
     public function generatekodeobat()
     {
         // Ambil 2 digit terakhir dari tahun
@@ -197,7 +198,7 @@ class AdminController extends Controller
     
         // Ambil transaksi terakhir untuk tahun berjalan
         $latestTransaction = Obat::whereYear('created_at', '=', date('Y'))
-            ->where('kode_obat', 'LIKE', "T{$currentYear}%") // Pastikan hanya transaksi tahun ini
+            ->where('kode_obat', 'LIKE', "O{$currentYear}%") // Pastikan hanya transaksi tahun ini
             ->orderBy('kode_obat', 'desc')
             ->first();
     
@@ -210,9 +211,9 @@ class AdminController extends Controller
         }
     
         // Format kode transaksi baru dengan 4 digit angka
-        $kode_obat = sprintf('K%s%04d', $currentYear, $nextNumber);
+        $kodeObat = sprintf('O%s%04d', $currentYear, $nextNumber);
     
-        return $kode_obat;
+        return $kodeObat;
     }
 
     public function tambahobat(){

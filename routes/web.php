@@ -14,9 +14,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// Route::get('/', function () {
-//     return view('welcome');
-// });
+Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 Auth::routes();
 
@@ -37,7 +35,6 @@ Route::middleware(['auth', 'role:admin|superadmin'])->group(function () {
 
 Route::middleware(['auth', 'role:member'])->group(function () {
     Route::get('/welcome', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-    Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 });
 
 Route::get('/listdatapasien', [AdminController::class, 'listdatapasien'])->name('listdatapasien');
