@@ -657,6 +657,7 @@
                         // Jika berhasil, update tampilan
                         stokTd.html(newStock);
                         $(".updatestok[data-id='" + obatId + "']").prop("disabled", newStock > 5);
+                        location.reload();
                     },
                     error: function () {
                         alert("Gagal memperbarui stok!");

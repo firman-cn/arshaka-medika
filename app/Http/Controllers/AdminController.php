@@ -365,6 +365,77 @@ class AdminController extends Controller
                     return dd($transaksi);
     }
 
+    public function cetakpemeriksaan($id){
+
+
+        $pemeriksaan = DB::table('pemeriksaans')
+                    ->join('pasiens', 'pemeriksaans.pasien', '=', 'pasiens.id')
+                    ->select('pemeriksaans.*', 'pasiens.*')
+                    ->where('pemeriksaans.id', $id)
+                    ->first();
+        
+         $pdf = new TCPDF();
+ 
+         // Set document informasi
+         $pdf->SetCreator('Klinik Kami');
+         $pdf->SetAuthor('Arshaka Medika');
+         $pdf->SetTitle('Nota Transaksi Pelayanan');
+         $pdf->SetSubject('Nota Transaksi');
+ 
+         // Hapus header dan footer default
+         $pdf->setPrintHeader(false);
+         $pdf->setPrintFooter(false);
+ 
+         // Tambahkan halaman baru
+         $pdf->AddPage();
+         $pdf->Image(public_path('admin_template/images/logo.png'), 55, 10, 20); // Path, X, Y, Width (30 mm).
+
+          // Set judul dokumen
+        $pdf->SetFont('helvetica', 'B', 20);
+        $pdf->Cell(0, 10, 'Arshaka-Medika', 0, 1, 'C', 0, '', 0, false, 'T', 'M');
+        $pdf->SetFont('helvetica', 'B', 14);
+        $pdf->Cell(0, 10, 'Nota Transaksi Pemeriksaan', 0, 1, 'C', 0, '', 0, false, 'T', 'M');
+
+
+         // Informasi transaksi
+         $pdf->SetFont('helvetica', '', 12);
+         $pdf->Ln(10);
+         $pdf->Cell(0, 10, 'Nomor Rekam Medis: ' . $pemeriksaan->nomor_rekam_medis, 0, 1);
+         $pdf->Cell(0, 10, 'Nama Pasien: ' . $pemeriksaan->nama_pasien, 0, 1);
+         $pdf->Cell(0, 10, 'Alamat: ' . $pemeriksaan->alamat, 0, 1);
+
+
+
+         $pdf->Ln(10);
+        $pdf->SetFont('helvetica', 'B', 12);
+
+        // Header Tabel
+        $pdf->Cell(10, 10, 'No', 1, 0, 'C');
+        $pdf->Cell(80, 10, 'Pelayanan', 1, 0, 'C');
+        $pdf->Cell(40, 10, 'Harga Pelayanan', 1, 0, 'C');
+
+        $pdf->SetFont('helvetica', '', 12);
+
+     
+        $pdf->Ln(10);
+
+        
+                // Total
+        $pdf->SetFont('helvetica', 'B', 12);
+        $pdf->Cell(10, 10, '1', 1, 0, 'C');
+        $pdf->Cell(80, 10, $pemeriksaan->pelayanan, 1, 0);
+        $pdf->Cell(40, 10, 'Rp ' . number_format($pemeriksaan->harga_pelayanan, 0, ',', '.'), 1, 1, 'R');
+
+        $pdf->SetFont('helvetica', 'B', 10);
+        $pdf->Cell(90, 10, 'Total Harga Pelayanan', 0, 0, 'R');
+        $pdf->Cell(50, 10, 'Rp ' . number_format($pemeriksaan->harga_pelayanan, 0, ',', '.'), 0, 1, 'R');
+
+
+
+        $pdf->Output('nota-transaksi.pdf', 'I');
+
+    }
+
     public function cetaktransaksiobat($kode_transaksi){
         DB::table('transaksis')
         ->where('kode_transaksi', $kode_transaksi)

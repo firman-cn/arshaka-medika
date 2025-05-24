@@ -92,9 +92,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                            <!-- END Edit Pasien Modal -->
-
-                                        
+                                            <!-- END Edit Pasien Modal -->  
                                         <button class="btn btn-primary"><i class=" mdi mdi-eye  "></i></button>
                                         <!-- <button class="btn btn-primary" id="updatestok" disabled><i class=" mdi mdi-plus  "></i></button> -->
                                         <button class="btn btn-primary updatestok" data-id="{{ $o->id }}" 

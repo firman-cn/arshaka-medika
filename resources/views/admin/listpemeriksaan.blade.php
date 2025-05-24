@@ -55,6 +55,8 @@
                                     <td>
                                         @if ($p->harga_pelayanan)
                                         <a type="button" href="{{ route('transaksiobat',  $p->id )}}" class="btn btn-primary">Beli Obat</a>
+                                        <!-- <a href="" class="btn btn-success" type="button">Cetak Pemeriksaan</a> -->
+                                        <a href="{{ route('cetakpemeriksaan', $p->id) }}" target="_blank" class="btn btn-success">Cetak Pemeriksaan</a>
                                         @else 
                                         <button type="button" class="btn btn-sm btn-secondary" onclick="alertHargaPelayanan()">
                                             Obat
